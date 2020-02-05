@@ -10,7 +10,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class)  // automatically populates createdAt and updatedAt fields
 @JsonIgnoreProperties(
         value = {"createdAt", "updatedAt"},
         allowGetters = true

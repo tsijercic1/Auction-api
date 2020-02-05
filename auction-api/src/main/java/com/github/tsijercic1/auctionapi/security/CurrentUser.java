@@ -9,4 +9,6 @@ import java.lang.annotation.*;
 @Documented
 @AuthenticationPrincipal
 public @interface CurrentUser {
+//    Spring security provides an annotation called @AuthenticationPrincipal
+//    to access the currently authenticated user in the controllers
 }

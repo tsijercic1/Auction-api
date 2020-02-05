@@ -22,9 +22,10 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-        securedEnabled = true,
-        jsr250Enabled = true,
-        prePostEnabled = true
+        securedEnabled = true, // enables method level security to use like @Secured("ROLE_ADMIN")
+        jsr250Enabled = true, // enables the annotation @RolesAllowed("ROLE_USER")
+        prePostEnabled = true // enables more complex expression based access control syntax
+                                // with @PreAuthorize and @PostAuthorize
 )
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -40,6 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
+        // configuring the manager for user roles and user details and the algorithm for password encoding
         authenticationManagerBuilder
                 .userDetailsService(customUserDetailsService)
                 .passwordEncoder(passwordEncoder());
@@ -58,6 +60,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        // global configuration for the server
         http
                 .cors()
                 .and()
@@ -86,8 +89,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .anyRequest()
                 .authenticated();
-//                .permitAll()
-//                .antMatchers(HttpMethod.GET, "/api/polls/**", "/api/users/**")
 
         // Add our custom JWT security filter
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);

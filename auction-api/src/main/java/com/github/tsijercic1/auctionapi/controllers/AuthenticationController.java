@@ -7,7 +7,7 @@ import com.github.tsijercic1.auctionapi.models.User;
 import com.github.tsijercic1.auctionapi.payload.ApiResponse;
 import com.github.tsijercic1.auctionapi.payload.JwtAuthenticationResponse;
 import com.github.tsijercic1.auctionapi.payload.LoginRequest;
-import com.github.tsijercic1.auctionapi.payload.SignUpRequest;
+import com.github.tsijercic1.auctionapi.payload.RegistrationRequest;
 import com.github.tsijercic1.auctionapi.repositories.RoleRepository;
 import com.github.tsijercic1.auctionapi.repositories.UserRepository;
 import com.github.tsijercic1.auctionapi.security.JwtTokenProvider;
@@ -65,26 +65,27 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignUpRequest signUpRequest) {
-        if (userRepository.existsByUsername(signUpRequest.getUsername())) {
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
+        // the request body gets mapped into the RegistrationRequest class
+        if (userRepository.existsByUsername(registrationRequest.getUsername())) {
             return new ResponseEntity(new ApiResponse(false, "Username is already taken!"),
                     HttpStatus.BAD_REQUEST);
         }
 
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             return new ResponseEntity(new ApiResponse(false, "Email Address already in use!"),
                     HttpStatus.BAD_REQUEST);
         }
 
         // Creating user's account
-        User user = new User(signUpRequest.getName(), signUpRequest.getSurname(), signUpRequest.getUsername(),
-                signUpRequest.getEmail(), signUpRequest.getPassword());
+        User user = new User(registrationRequest.getName(), registrationRequest.getSurname(), registrationRequest.getUsername(),
+                registrationRequest.getEmail(), registrationRequest.getPassword());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
-
+        // the default role is USER, later we will add ADMIN role
         user.setRoles(Collections.singleton(userRole));
 
         User result = userRepository.save(user);

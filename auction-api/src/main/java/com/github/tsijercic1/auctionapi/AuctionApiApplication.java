@@ -11,7 +11,7 @@ import java.util.TimeZone;
 @SpringBootApplication
 @EntityScan(basePackageClasses = {
         AuctionApiApplication.class,
-        Jsr310JpaConverters.class
+        Jsr310JpaConverters.class   // registered JPA converter for datatype conversion to sql types
 })
 public class AuctionApiApplication {
 
