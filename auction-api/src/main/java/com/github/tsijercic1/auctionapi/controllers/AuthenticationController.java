@@ -2,7 +2,7 @@ package com.github.tsijercic1.auctionapi.controllers;
 
 import com.github.tsijercic1.auctionapi.exceptions.AppException;
 import com.github.tsijercic1.auctionapi.models.Role;
-import com.github.tsijercic1.auctionapi.models.RoleName;
+import com.github.tsijercic1.auctionapi.models.RoleType;
 import com.github.tsijercic1.auctionapi.models.User;
 import com.github.tsijercic1.auctionapi.payload.ApiResponse;
 import com.github.tsijercic1.auctionapi.payload.JwtAuthenticationResponse;
@@ -64,6 +64,15 @@ public class AuthenticationController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    /**
+     *
+     * @param registrationRequest
+     * body of the registration username, email, password, name, surname
+     *
+     * checks if the username and email are unique
+     * creates a user and sets his role of type USER which is default
+     * @return
+     */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
         // the request body gets mapped into the RegistrationRequest class
@@ -77,15 +86,14 @@ public class AuthenticationController {
                     HttpStatus.BAD_REQUEST);
         }
 
-        // Creating user's account
         User user = new User(registrationRequest.getName(), registrationRequest.getSurname(), registrationRequest.getUsername(),
                 registrationRequest.getEmail(), registrationRequest.getPassword());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
+        Role userRole = roleRepository.findByName(RoleType.USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
-        // the default role is USER, later we will add ADMIN role
+
         user.setRoles(Collections.singleton(userRole));
 
         User result = userRepository.save(user);

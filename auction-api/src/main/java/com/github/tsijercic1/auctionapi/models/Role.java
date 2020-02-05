@@ -14,12 +14,12 @@ public class Role {
     @Enumerated(EnumType.STRING)
     @NaturalId
     @Column(length = 60)
-    private RoleName name;
+    private RoleType name;
 
     public Role() {
     }
 
-    public Role(RoleName name) {
+    public Role(RoleType name) {
         this.name = name;
     }
 
@@ -31,11 +31,11 @@ public class Role {
         this.id = id;
     }
 
-    public RoleName getName() {
+    public RoleType getName() {
         return name;
     }
 
-    public void setName(RoleName name) {
+    public void setName(RoleType name) {
         this.name = name;
     }
 }

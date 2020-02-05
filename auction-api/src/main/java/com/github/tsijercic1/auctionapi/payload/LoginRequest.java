@@ -2,6 +2,9 @@ package com.github.tsijercic1.auctionapi.payload;
 
 import javax.validation.constraints.NotBlank;
 
+/**
+ * class which gets populated on login
+ */
 public class LoginRequest {
     @NotBlank
     private String usernameOrEmail;

@@ -8,10 +8,14 @@ import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
+/**
+ * Jsr310JpaConverters.class
+ * registered JPA converter for datatype conversion to sql types
+ */
 @SpringBootApplication
 @EntityScan(basePackageClasses = {
         AuctionApiApplication.class,
-        Jsr310JpaConverters.class   // registered JPA converter for datatype conversion to sql types
+        Jsr310JpaConverters.class
 })
 public class AuctionApiApplication {
 

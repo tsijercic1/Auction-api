@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+/**
+ * json web token generator
+ */
 @Component
 public class JwtTokenProvider {
     private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
@@ -19,6 +22,16 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
+    /**
+     *
+     * @param authentication
+     * objects that contains auth info of the user
+     * uses id of the UserDetails as data
+     * sets the current date
+     * sets the expiration date
+     * signs the key with an algorithm and uses a secret key to do so
+     * @return
+     */
     public String generateToken(Authentication authentication) {
 
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
@@ -34,6 +47,12 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    /**
+     *
+     * @param token
+     * user token
+     * @return user id
+     */
     public Long getUserIdFromJWT(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
@@ -43,6 +62,12 @@ public class JwtTokenProvider {
         return Long.parseLong(claims.getSubject());
     }
 
+    /**
+     *
+     * @param authToken
+     * user token
+     * @return is it valid
+     */
     public boolean validateToken(String authToken) {
         try {
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);

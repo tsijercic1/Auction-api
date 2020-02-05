@@ -32,6 +32,11 @@ public class UserPrincipal implements UserDetails {
         this.authorities = authorities;
     }
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     public static UserPrincipal create(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
                 new SimpleGrantedAuthority(role.getName().name())

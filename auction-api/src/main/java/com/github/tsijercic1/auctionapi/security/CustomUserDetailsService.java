@@ -14,11 +14,18 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Autowired
     UserRepository userRepository;
 
+    /**
+     *
+     * @param usernameOrEmail
+     * username or email of the user
+     * @return
+     * returns the details of the user such as name, surname, roles used for access control
+     * @throws UsernameNotFoundException
+     */
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String usernameOrEmail)
-            throws UsernameNotFoundException {
-        // Let people login with either username or email
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+
         User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
                 .orElseThrow(() ->
                         new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail)
@@ -27,7 +34,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         return UserPrincipal.create(user);
     }
 
-    // This method is used by JWTAuthenticationFilter
+    /**
+     * This method is used by JWTAuthenticationFilter
+     * @param id
+     * user id in the database
+     * @return
+     * returns the details of the user such as name, surname, roles used for access control
+     */
     @Transactional
     public UserDetails loadUserById(Long id) {
         User user = userRepository.findById(id).orElseThrow(

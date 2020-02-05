@@ -6,7 +6,6 @@ import com.github.tsijercic1.auctionapi.security.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -19,13 +18,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+/**
+ * securedEnabled enables method level security to use like @Secured("ADMIN")
+ * jsr250Enabled enables the annotation @RolesAllowed("USER")
+ * prePostEnabled enables more complex expression based access control syntax
+ *                  with @PreAuthorize and @PostAuthorize
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-        securedEnabled = true, // enables method level security to use like @Secured("ROLE_ADMIN")
-        jsr250Enabled = true, // enables the annotation @RolesAllowed("ROLE_USER")
-        prePostEnabled = true // enables more complex expression based access control syntax
-                                // with @PreAuthorize and @PostAuthorize
+        securedEnabled = true,
+        jsr250Enabled = true,
+        prePostEnabled = true
 )
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -39,9 +43,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new JwtAuthenticationFilter();
     }
 
+    /**
+     * configuring the manager for user roles and user details and the algorithm for password encoding
+     * @param authenticationManagerBuilder
+     * @throws Exception
+     */
     @Override
     public void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
-        // configuring the manager for user roles and user details and the algorithm for password encoding
+
         authenticationManagerBuilder
                 .userDetailsService(customUserDetailsService)
                 .passwordEncoder(passwordEncoder());
@@ -58,9 +67,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+
+    /**
+     * global configuration for the server
+     * configuring cors csrf
+     * unauthorizedHandler returns unauthorized as a response
+     * adds our own layer of filtering the web token that is received
+     * @param http
+     * security of the communication between clients and this server
+     * @throws Exception
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        // global configuration for the server
         http
                 .cors()
                 .and()
@@ -90,7 +108,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .anyRequest()
                 .authenticated();
 
-        // Add our custom JWT security filter
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
 
     }

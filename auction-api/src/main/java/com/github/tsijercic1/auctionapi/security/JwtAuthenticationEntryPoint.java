@@ -14,8 +14,14 @@ import java.io.IOException;
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationEntryPoint.class);
 
-    // this method is called whenever an exception is thrown due to an unauthenticated user
-    // trying to access a resource that requires authentication
+    /**
+     * this method is called whenever an exception is thrown due to an unauthenticated user
+     * trying to access a resource that requires authentication
+     * @param httpServletRequest
+     * @param httpServletResponse
+     * @param e
+     * @throws IOException
+     */
     @Override
     public void commence(HttpServletRequest httpServletRequest,
                          HttpServletResponse httpServletResponse,

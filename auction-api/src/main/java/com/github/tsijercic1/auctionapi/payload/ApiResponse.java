@@ -1,5 +1,9 @@
 package com.github.tsijercic1.auctionapi.payload;
 
+
+/**
+ * the default response structure of the API
+ */
 public class ApiResponse {
     private Boolean success;
     private String message;

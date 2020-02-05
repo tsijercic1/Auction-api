@@ -1,5 +1,8 @@
 package com.github.tsijercic1.auctionapi.payload;
 
+/**
+ * the default authentication response structure
+ */
 public class JwtAuthenticationResponse {
     private String accessToken;
     private String tokenType = "Bearer";
