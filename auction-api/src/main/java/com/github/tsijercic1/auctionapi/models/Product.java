@@ -4,9 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -37,6 +35,11 @@ public class Product extends AuditModel {
             fetch = FetchType.LAZY,
             mappedBy = "product")
     private Set<ProductPicture> pictures = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "product")
+    private Set<Bid> bids = new HashSet<>( );
 
     public Product() {
     }
@@ -138,5 +141,13 @@ public class Product extends AuditModel {
 
     public void setPictures(Set<ProductPicture> pictures) {
         this.pictures = pictures;
+    }
+
+    public Set<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(Set<Bid> bids) {
+        this.bids = bids;
     }
 }

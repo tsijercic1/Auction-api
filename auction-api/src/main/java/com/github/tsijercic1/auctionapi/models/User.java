@@ -56,6 +56,10 @@ public class User extends AuditModel {
     private String phoneNumber;
 
 
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "user")
+    private Set<Bid> bids = new HashSet<>( );
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
@@ -154,4 +158,11 @@ public class User extends AuditModel {
         this.phoneNumber = phoneNumber;
     }
 
+    public Set<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(Set<Bid> bids) {
+        this.bids = bids;
+    }
 }
