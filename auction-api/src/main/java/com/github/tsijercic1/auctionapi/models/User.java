@@ -57,8 +57,7 @@ public class User extends AuditModel {
 
 
     @OneToMany(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            mappedBy = "user")
+            fetch = FetchType.LAZY)
     private Set<Bid> bids = new HashSet<>( );
 
     @ManyToMany(fetch = FetchType.LAZY)
