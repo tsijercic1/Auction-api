@@ -1,6 +1,7 @@
 package com.github.tsijercic1.auctionapi.models;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 
 @Entity
@@ -13,6 +14,7 @@ public class Bid extends AuditModel {
     private Product product;
     @ManyToOne
     private User bidder;
+    @NotBlank
     private BigDecimal amount;
 
     public Bid() {

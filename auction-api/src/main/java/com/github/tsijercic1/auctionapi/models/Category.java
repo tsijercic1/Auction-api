@@ -1,6 +1,7 @@
 package com.github.tsijercic1.auctionapi.models;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "categories")
@@ -8,6 +9,7 @@ public class Category extends AuditModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     private String name;
 
     public Category() {
