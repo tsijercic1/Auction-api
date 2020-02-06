@@ -2,6 +2,8 @@ package com.github.tsijercic1.auctionapi.models;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "categories")
@@ -11,6 +13,11 @@ public class Category extends AuditModel {
     private Long id;
     @NotBlank
     private String name;
+
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "category")
+    private Set<Subcategory> subcategories = new HashSet<>( );
 
     public Category() {
     }
