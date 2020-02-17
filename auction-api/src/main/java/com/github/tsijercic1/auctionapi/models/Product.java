@@ -41,6 +41,11 @@ public class Product extends AuditModel {
             mappedBy = "product")
     private Set<Bid> bids = new HashSet<>( );
 
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "product")
+    private Set<Watch> watchList = new HashSet<>( );
+
     public Product() {
     }
 
@@ -149,5 +154,13 @@ public class Product extends AuditModel {
 
     public void setBids(Set<Bid> bids) {
         this.bids = bids;
+    }
+
+    public Set<Watch> getWatchList() {
+        return watchList;
+    }
+
+    public void setWatchList(Set<Watch> watchList) {
+        this.watchList = watchList;
     }
 }

@@ -57,8 +57,14 @@ public class User extends AuditModel {
 
 
     @OneToMany(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY)
+            fetch = FetchType.LAZY,
+            mappedBy = "bidder")
     private Set<Bid> bids = new HashSet<>( );
+
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "watcher")
+    private Set<Watch> watchList = new HashSet<>( );
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_roles",
@@ -163,5 +169,13 @@ public class User extends AuditModel {
 
     public void setBids(Set<Bid> bids) {
         this.bids = bids;
+    }
+
+    public Set<Watch> getWatchList() {
+        return watchList;
+    }
+
+    public void setWatchList(Set<Watch> watchList) {
+        this.watchList = watchList;
     }
 }
