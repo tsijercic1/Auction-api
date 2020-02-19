@@ -26,7 +26,7 @@ import java.util.Set;
 })
 public class User extends AuditModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @NotBlank
@@ -38,12 +38,12 @@ public class User extends AuditModel {
     private String surname;
 
     @NotBlank
-    @Size(max = 15)
+    @Size(max = 65)
     private String username;
 
     @NaturalId
     @NotBlank
-    @Size(max = 40)
+    @Size(max = 320)
     @Email
     private String email;
 

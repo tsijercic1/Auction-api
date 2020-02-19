@@ -9,7 +9,7 @@ import java.util.Set;
 @Table(name = "categories")
 public class Category extends AuditModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotBlank
     private String name;

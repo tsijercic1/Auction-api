@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 @Table(name = "subcategories")
 public class Subcategory extends AuditModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotBlank
     private String name;

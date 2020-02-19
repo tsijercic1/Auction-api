@@ -6,15 +6,13 @@ import javax.persistence.*;
 @Table(name = "watches")
 public class Watch extends AuditModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @ManyToOne
-    //@JoinColumn(name = "product_id")
     private Product product;
 
     @ManyToOne
-    //@JoinColumn(name = "watcher_id")
     private User watcher;
 
     public Watch() {

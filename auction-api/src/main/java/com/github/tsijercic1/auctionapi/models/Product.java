@@ -11,7 +11,7 @@ import java.util.Set;
 @Table(name = "products")
 public class Product extends AuditModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NotBlank
     private String name;
