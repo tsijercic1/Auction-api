@@ -153,6 +153,9 @@ create table watches
 
 alter table watches owner to root;
 
+insert into roles
+values (1, 'USER');
+
 
 
 --
