@@ -1,0 +1,14 @@
+<div>
+  <div class="row">
+    <span class="col" id="category-name">{{category.name}}</span>
+    <span class="my-auto" *ngIf="!clicked; else elseBlock">
+      <span class="fa fa-plus col text-right my-auto" (click)="toggle()"></span>
+    </span>
+    <ng-template #elseBlock>
+      <span class="fa fa-minus col text-right my-auto" (click)="toggle()" style="color: #7e6ed3"></span>
+    </ng-template>
+  </div>
+  <ul *ngIf="clicked" class="px-0" id="subcategories">
+    <li *ngFor="let sub of category.subcategories">{{sub}}</li>
+  </ul>
+</div>

@@ -1,17 +1,20 @@
 package com.github.tsijercic1.auctionapi.controllers;
 
 import com.github.tsijercic1.auctionapi.exceptions.AppException;
+import com.github.tsijercic1.auctionapi.exceptions.ResourceNotFoundException;
+import com.github.tsijercic1.auctionapi.exceptions.UnauthorizedException;
 import com.github.tsijercic1.auctionapi.models.Role;
 import com.github.tsijercic1.auctionapi.models.RoleType;
 import com.github.tsijercic1.auctionapi.models.User;
-import com.github.tsijercic1.auctionapi.payload.ApiResponse;
-import com.github.tsijercic1.auctionapi.payload.JwtAuthenticationResponse;
-import com.github.tsijercic1.auctionapi.payload.LoginRequest;
-import com.github.tsijercic1.auctionapi.payload.RegistrationRequest;
+import com.github.tsijercic1.auctionapi.payload.*;
 import com.github.tsijercic1.auctionapi.repositories.RoleRepository;
 import com.github.tsijercic1.auctionapi.repositories.UserRepository;
+import com.github.tsijercic1.auctionapi.security.CurrentUser;
+import com.github.tsijercic1.auctionapi.security.JwtAuthenticationFilter;
 import com.github.tsijercic1.auctionapi.security.JwtTokenProvider;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.github.tsijercic1.auctionapi.security.UserPrincipal;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,12 +28,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
+import java.util.Optional;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthenticationController {
-
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
     final AuthenticationManager authenticationManager;
     final UserRepository userRepository;
     final RoleRepository roleRepository;
@@ -63,6 +67,34 @@ public class AuthenticationController {
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshUserData(@CurrentUser UserPrincipal userPrincipal) {
+        if (userPrincipal != null) {
+            logger.info(userPrincipal.getUsername());
+            logger.info(userPrincipal.getPassword());
+            logger.info(userPrincipal.getEmail());
+
+
+            String jwt = tokenProvider.generateToken(userPrincipal);
+            Optional<User> userOptional = userRepository.findByEmail(userPrincipal.getEmail());
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                UserData userData = new UserData(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getName(),
+                        user.getSurname(),
+                        jwt
+                );
+                return ResponseEntity.ok(userData);
+            }
+            throw new ResourceNotFoundException("User", "email", userPrincipal.getEmail());
+        }
+
+        throw new UnauthorizedException("Unauthorized");
+    }
+
     /**
      *
      * @param registrationRequest
@@ -75,7 +107,8 @@ public class AuthenticationController {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
         // the request body gets mapped into the RegistrationRequest class
-        if (userRepository.existsByUsername(registrationRequest.getUsername())) {
+        String username = registrationRequest.getEmail().split("@")[0];
+        if (userRepository.existsByUsername(username)) {
             return new ResponseEntity<>(new ApiResponse(false, "Username is already taken!"),
                     HttpStatus.BAD_REQUEST);
         }
@@ -84,8 +117,7 @@ public class AuthenticationController {
             return new ResponseEntity<>(new ApiResponse(false, "Email Address already in use!"),
                     HttpStatus.BAD_REQUEST);
         }
-
-        User user = new User(registrationRequest.getName(), registrationRequest.getSurname(), registrationRequest.getUsername(),
+        User user = new User(registrationRequest.getName(), registrationRequest.getSurname(), username,
                 registrationRequest.getEmail(), registrationRequest.getPassword());
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -93,14 +125,11 @@ public class AuthenticationController {
         Role userRole = roleRepository.findByName(RoleType.USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setRoles(Collections.singleton(userRole));
+//        user.setRole(userRole);
 
-        User result = userRepository.save(user);
 
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentContextPath().path("/api/users/{username}")
-                .buildAndExpand(result.getUsername()).toUri();
-
-        return ResponseEntity.created(location).body(new ApiResponse(true, "User registered successfully"));
+        User result = null;
+        result = userRepository.save(user);
+        return ResponseEntity.ok(new ApiResponse(true, "s"));
     }
 }

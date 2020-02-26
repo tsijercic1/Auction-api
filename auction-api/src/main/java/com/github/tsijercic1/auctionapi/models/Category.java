@@ -1,5 +1,7 @@
 package com.github.tsijercic1.auctionapi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import java.util.HashSet;
@@ -17,6 +19,7 @@ public class Category extends AuditModel {
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             mappedBy = "category")
+    @JsonBackReference
     private Set<Subcategory> subcategories = new HashSet<>( );
 
     public Category() {

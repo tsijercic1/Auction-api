@@ -15,6 +15,16 @@ create table categories
 
 alter table categories owner to root;
 
+create table hibernate_sequences
+(
+	sequence_name varchar(255) not null
+		constraint hibernate_sequences_pkey
+			primary key,
+	next_val bigint
+);
+
+alter table hibernate_sequences owner to root;
+
 create table roles
 (
 	id bigint not null
@@ -60,7 +70,10 @@ create table users
 	surname varchar(40),
 	username varchar(65)
 		constraint ukr43af9ap4edm43mmtq01oddj6
-			unique
+			unique,
+	role_id bigint
+		constraint fkp56c1712k691lhsyewcssf40f
+			references roles
 );
 
 alter table users owner to root;
@@ -122,20 +135,6 @@ create table product_pictures
 
 alter table product_pictures owner to root;
 
-create table user_roles
-(
-	user_id bigint not null
-		constraint fkhfh9dx7w3ubf1co1vdev94g3f
-			references users,
-	role_id bigint not null
-		constraint fkh8ciramu9cc9q3qcqiv4ue8a6
-			references roles,
-	constraint user_roles_pkey
-		primary key (user_id, role_id)
-);
-
-alter table user_roles owner to root;
-
 create table watches
 (
 	id bigint not null
@@ -152,6 +151,8 @@ create table watches
 );
 
 alter table watches owner to root;
+
+
 
 insert into roles
 values (1, 'USER');

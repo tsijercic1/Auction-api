@@ -1,0 +1,51 @@
+<nav class="navbar navbar-dark py-0" style="background-color: #252525;" >
+  <div class="container-fluid justify-content-center">
+    <div class="row w-100 justify-content-center">
+      <div class="navbar-header col-sm-5 mr-3">
+        <a href="https://facebook.com" class="navbar-brand"><img src="../../assets/svg/facebook.svg" height="25px" width="25px" alt="Facebook"/></a>
+        <a href="https://twitter.com" class="navbar-brand"><img src="../../assets/svg/twitter.svg" height="25px" width="25px" alt="Twitter"/></a>
+        <a href="https://instagram.com" class="navbar-brand"><img src="../../assets/svg/instagram.svg" height="25px" width="25px" alt="Instagram"/></a>
+        <a href="https://google.com" class="navbar-brand"><img src="../../assets/svg/google-plus.svg" height="25px" width="25px" alt="google+"/></a>
+      </div>
+      <div class="navbar-nav col-sm-5 text-right my-auto ml-1">
+        <span *ngIf="!loginService.isLoggedIn; else elseBlock">
+          <span class="text-secondary nav-item" style="word-spacing: 15px;font-size: 0.80em;"><a class="text-light" routerLink="/login">Login</a> or <a style="word-spacing: initial" class="text-light" routerLink="/register">Create an account</a></span>
+        </span>
+        <ng-template #elseBlock><a class="text-light" (click)="logout()">Logout</a></ng-template>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<nav class="navbar navbar-expand navbar-light bg-light row bg-white">
+  <a class="navbar-brand col-2 col-md-2 offset-1" style="color: #7e6ed3" href="#">AUCTION</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse"
+          data-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02"
+          aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse col-12 col-md-8 row" id="navbarTogglerDemo02">
+    <form class="form-inline my-2 my-0 col-7 offset-1">
+      <input class="form-control mr-n4 mr-sm-n4 rounded-0 w-100" type="search"
+             placeholder="Search" aria-label="Search">
+      <span class="fa fa-search"></span>
+    </form>
+    <ul class="navbar-nav text-nowrap col-8 col-md-3 offset-1 justify-content-between">
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/home" >HOME</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/shop" >SHOP</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" routerLink="/myAccount" >MY ACCOUNT</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+<nav aria-label="breadcrumb" class="breadcrumb-bg-color row py-1">
+  <ol class="breadcrumb breadcrumb-bg-color col-md-auto offset-1 pl-5 my-auto" id="breadcrumb">
+  </ol>
+</nav>

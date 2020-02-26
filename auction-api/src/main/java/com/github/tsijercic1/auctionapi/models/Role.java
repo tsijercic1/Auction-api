@@ -1,8 +1,11 @@
 package com.github.tsijercic1.auctionapi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "roles")
@@ -15,6 +18,12 @@ public class Role {
     @NaturalId
     @Column(length = 60)
     private RoleType name;
+
+//    @OneToMany(cascade = CascadeType.ALL,
+//            fetch = FetchType.LAZY,
+//            mappedBy = "role")
+//    @JsonBackReference
+//    private Set<User> users = new HashSet<>( );
 
     public Role() {
     }

@@ -1,7 +1,12 @@
 package com.github.tsijercic1.auctionapi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
@@ -16,19 +21,18 @@ public class Product extends AuditModel {
     @NotBlank
     private String name;
     private String description;
-    @NotBlank
     private BigDecimal startPrice;
-    @NotBlank
     private Instant auctionStart;
-    @NotBlank
     private Instant auctionEnd;
     private String color;
     private String size;
 
     @ManyToOne
+    @JsonManagedReference
     private Subcategory subcategory;
 
     @ManyToOne
+    @JsonManagedReference
     private User seller;
 
     @OneToMany(cascade = CascadeType.ALL,
@@ -44,6 +48,7 @@ public class Product extends AuditModel {
     @OneToMany(cascade = CascadeType.ALL,
             fetch = FetchType.LAZY,
             mappedBy = "product")
+    @JsonBackReference
     private Set<Watch> watchList = new HashSet<>( );
 
     public Product() {

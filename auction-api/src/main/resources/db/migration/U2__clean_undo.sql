@@ -18,4 +18,4 @@ drop table if exists categories cascade;
 
 drop table if exists users cascade;
 
-drop sequence hibernate_sequence;
+-- drop sequence hibernate_sequence;

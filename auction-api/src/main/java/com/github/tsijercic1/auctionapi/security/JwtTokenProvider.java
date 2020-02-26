@@ -47,6 +47,18 @@ public class JwtTokenProvider {
                 .compact();
     }
 
+    public String generateToken(UserPrincipal userPrincipal) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+
+        return Jwts.builder()
+                .setSubject(Long.toString(userPrincipal.getId()))
+                .setIssuedAt(new Date())
+                .setExpiration(expiryDate)
+                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .compact();
+    }
+
     /**
      *
      * @param token
@@ -70,6 +82,7 @@ public class JwtTokenProvider {
      */
     public boolean validateToken(String authToken) {
         try {
+            logger.info(authToken);
             Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {

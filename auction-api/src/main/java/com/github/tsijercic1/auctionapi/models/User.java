@@ -1,5 +1,10 @@
 package com.github.tsijercic1.auctionapi.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -55,22 +60,21 @@ public class User extends AuditModel {
     private String gender;
     private String phoneNumber;
 
+//
+//    @OneToMany(cascade = CascadeType.ALL,
+//            fetch = FetchType.LAZY,
+//            mappedBy = "bidder")
+//    private Set<Bid> bids = new HashSet<>( );
+//
+//    @OneToMany(cascade = CascadeType.ALL,
+//            fetch = FetchType.LAZY,
+//            mappedBy = "watcher")
+//    @JsonBackReference
+//    private Set<Watch> watchList = new HashSet<>( );
 
-    @OneToMany(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            mappedBy = "bidder")
-    private Set<Bid> bids = new HashSet<>( );
-
-    @OneToMany(cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY,
-            mappedBy = "watcher")
-    private Set<Watch> watchList = new HashSet<>( );
-
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JsonManagedReference
+//    private Role role;
 
     public User() {
     }
@@ -82,6 +86,14 @@ public class User extends AuditModel {
         this.email = email;
         this.password = password;
     }
+
+//    public Role getRole() {
+//        return role;
+//    }
+//
+//    public void setRole(Role role) {
+//        this.role = role;
+//    }
 
     public Long getId() {
         return id;
@@ -131,13 +143,6 @@ public class User extends AuditModel {
         this.password = password;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
 
     public String getProfilePictureUrl() {
         return profilePictureUrl;
@@ -163,19 +168,19 @@ public class User extends AuditModel {
         this.phoneNumber = phoneNumber;
     }
 
-    public Set<Bid> getBids() {
-        return bids;
-    }
-
-    public void setBids(Set<Bid> bids) {
-        this.bids = bids;
-    }
-
-    public Set<Watch> getWatchList() {
-        return watchList;
-    }
-
-    public void setWatchList(Set<Watch> watchList) {
-        this.watchList = watchList;
-    }
+//    public Set<Bid> getBids() {
+//        return bids;
+//    }
+//
+//    public void setBids(Set<Bid> bids) {
+//        this.bids = bids;
+//    }
+//
+//    public Set<Watch> getWatchList() {
+//        return watchList;
+//    }
+//
+//    public void setWatchList(Set<Watch> watchList) {
+//        this.watchList = watchList;
+//    }
 }

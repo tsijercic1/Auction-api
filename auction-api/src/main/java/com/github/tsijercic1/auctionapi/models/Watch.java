@@ -1,5 +1,7 @@
 package com.github.tsijercic1.auctionapi.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 
 @Entity
@@ -10,10 +12,12 @@ public class Watch extends AuditModel {
     private Long id;
 
     @ManyToOne
+    @JsonManagedReference
     private Product product;
 
-    @ManyToOne
-    private User watcher;
+//    @ManyToOne
+//    @JsonManagedReference
+//    private User watcher;
 
     public Watch() {
     }
@@ -34,11 +38,11 @@ public class Watch extends AuditModel {
         this.product = product;
     }
 
-    public User getWatcher() {
-        return watcher;
-    }
-
-    public void setWatcher(User watcher) {
-        this.watcher = watcher;
-    }
+//    public User getWatcher() {
+//        return watcher;
+//    }
+//
+//    public void setWatcher(User watcher) {
+//        this.watcher = watcher;
+//    }
 }
