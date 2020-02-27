@@ -25,10 +25,6 @@ public class Category extends AuditModel {
     public Category() {
     }
 
-    public Category(String name) {
-        this.name = name;
-    }
-
     public Long getId() {
         return id;
     }
@@ -43,5 +39,13 @@ public class Category extends AuditModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Set<Subcategory> getSubcategories() {
+        return subcategories;
+    }
+
+    public void setSubcategories(Set<Subcategory> subcategories) {
+        this.subcategories = subcategories;
     }
 }

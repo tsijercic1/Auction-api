@@ -1,19 +1,14 @@
 package com.github.tsijercic1.auctionapi.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 
@@ -22,9 +17,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {
-                "username"
-        }),
         @UniqueConstraint(columnNames = {
                 "email"
         })
@@ -42,10 +34,6 @@ public class User extends AuditModel {
     @Size(max = 40)
     private String surname;
 
-    @NotBlank
-    @Size(max = 65)
-    private String username;
-
     @NaturalId
     @NotBlank
     @Size(max = 320)
@@ -60,40 +48,25 @@ public class User extends AuditModel {
     private String gender;
     private String phoneNumber;
 
-//
-//    @OneToMany(cascade = CascadeType.ALL,
-//            fetch = FetchType.LAZY,
-//            mappedBy = "bidder")
-//    private Set<Bid> bids = new HashSet<>( );
-//
-//    @OneToMany(cascade = CascadeType.ALL,
-//            fetch = FetchType.LAZY,
-//            mappedBy = "watcher")
-//    @JsonBackReference
-//    private Set<Watch> watchList = new HashSet<>( );
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JsonManagedReference
-//    private Role role;
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "bidder")
+    @JsonBackReference
+    private Set<Bid> bids = new HashSet<>( );
+
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "watcher")
+    @JsonBackReference
+    private Set<Watch> watchList = new HashSet<>( );
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonManagedReference
+    private Role role;
 
     public User() {
     }
-
-    public User(String name, String surname , String username, String email, String password) {
-        this.name = name;
-        this.surname = surname;
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
-//    public Role getRole() {
-//        return role;
-//    }
-//
-//    public void setRole(Role role) {
-//        this.role = role;
-//    }
 
     public Long getId() {
         return id;
@@ -119,14 +92,6 @@ public class User extends AuditModel {
         this.surname = surname;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -142,7 +107,6 @@ public class User extends AuditModel {
     public void setPassword(String password) {
         this.password = password;
     }
-
 
     public String getProfilePictureUrl() {
         return profilePictureUrl;
@@ -168,19 +132,27 @@ public class User extends AuditModel {
         this.phoneNumber = phoneNumber;
     }
 
-//    public Set<Bid> getBids() {
-//        return bids;
-//    }
-//
-//    public void setBids(Set<Bid> bids) {
-//        this.bids = bids;
-//    }
-//
-//    public Set<Watch> getWatchList() {
-//        return watchList;
-//    }
-//
-//    public void setWatchList(Set<Watch> watchList) {
-//        this.watchList = watchList;
-//    }
+    public Set<Bid> getBids() {
+        return bids;
+    }
+
+    public void setBids(Set<Bid> bids) {
+        this.bids = bids;
+    }
+
+    public Set<Watch> getWatchList() {
+        return watchList;
+    }
+
+    public void setWatchList(Set<Watch> watchList) {
+        this.watchList = watchList;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
 }

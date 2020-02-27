@@ -17,7 +17,7 @@ public class ProductPictureService {
     }
 
     public ProductPicture create(MultipartFile multiPartFile, Product product) {
-        String url = fileStorageService.storeFile(multiPartFile, product.getId());
+        String url = fileStorageService.storeFile(multiPartFile, product.getId(), product.getSeller().getId());
         ProductPicture productPicture = new ProductPicture();
         productPicture.setUrl(url);
         productPicture.setProduct(product);

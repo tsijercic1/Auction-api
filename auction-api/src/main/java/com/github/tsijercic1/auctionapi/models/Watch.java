@@ -15,9 +15,9 @@ public class Watch extends AuditModel {
     @JsonManagedReference
     private Product product;
 
-//    @ManyToOne
-//    @JsonManagedReference
-//    private User watcher;
+    @ManyToOne
+    @JsonManagedReference
+    private User watcher;
 
     public Watch() {
     }
@@ -38,11 +38,11 @@ public class Watch extends AuditModel {
         this.product = product;
     }
 
-//    public User getWatcher() {
-//        return watcher;
-//    }
-//
-//    public void setWatcher(User watcher) {
-//        this.watcher = watcher;
-//    }
+    public User getWatcher() {
+        return watcher;
+    }
+
+    public void setWatcher(User watcher) {
+        this.watcher = watcher;
+    }
 }

@@ -1,11 +1,8 @@
-package com.github.tsijercic1.auctionapi.payload;
-
-import org.springframework.web.multipart.MultipartFile;
+package com.github.tsijercic1.auctionapi.request;
 
 import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.List;
 
 public class ProductRequest {
     @NotBlank
@@ -14,25 +11,11 @@ public class ProductRequest {
     private BigDecimal startPrice;
     private Instant auctionStart;
     private Instant auctionEnd;
-    private String color;
-    private String size;
     @NotBlank
     private String subcategory;
 
 
     public ProductRequest() {
-    }
-
-    public ProductRequest(String name, String description, BigDecimal startPrice, Instant auctionStart, Instant auctionEnd, String color,
-                          String size, String subcategory) {
-        this.name = name;
-        this.description = description;
-        this.startPrice = startPrice;
-        this.auctionStart = auctionStart;
-        this.auctionEnd = auctionEnd;
-        this.color = color;
-        this.size = size;
-        this.subcategory = subcategory;
     }
 
     public String getName() {
@@ -65,22 +48,6 @@ public class ProductRequest {
 
     public void setAuctionStart(Instant auctionStart) {
         this.auctionStart = auctionStart;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
     }
 
     public String getSubcategory() {

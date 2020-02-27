@@ -18,17 +18,13 @@ public class Bid extends AuditModel {
     @JsonIgnore
     private Product product;
 
-//    @ManyToOne
-//    @JsonIgnore
-//    private User bidder;
+    @ManyToOne
+    @JsonIgnore
+    private User bidder;
 
     private BigDecimal amount;
 
     public Bid() {
-    }
-
-    public Bid(BigDecimal amount) {
-        this.amount = amount;
     }
 
     public Long getId() {
@@ -47,13 +43,13 @@ public class Bid extends AuditModel {
         this.product = product;
     }
 
-//    public User getBidder() {
-//        return bidder;
-//    }
-//
-//    public void setBidder(User bidder) {
-//        this.bidder = bidder;
-//    }
+    public User getBidder() {
+        return bidder;
+    }
+
+    public void setBidder(User bidder) {
+        this.bidder = bidder;
+    }
 
     public BigDecimal getAmount() {
         return amount;

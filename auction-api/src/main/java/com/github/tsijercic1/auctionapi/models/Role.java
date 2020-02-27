@@ -19,13 +19,21 @@ public class Role {
     @Column(length = 60)
     private RoleType name;
 
-//    @OneToMany(cascade = CascadeType.ALL,
-//            fetch = FetchType.LAZY,
-//            mappedBy = "role")
-//    @JsonBackReference
-//    private Set<User> users = new HashSet<>( );
+    @OneToMany(cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            mappedBy = "role")
+    @JsonBackReference
+    private Set<User> users = new HashSet<>( );
 
     public Role() {
+    }
+
+    public Set<User> getUsers() {
+        return users;
+    }
+
+    public void setUsers(Set<User> users) {
+        this.users = users;
     }
 
     public Role(RoleType name) {

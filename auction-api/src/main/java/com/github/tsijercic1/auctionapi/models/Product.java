@@ -24,8 +24,6 @@ public class Product extends AuditModel {
     private BigDecimal startPrice;
     private Instant auctionStart;
     private Instant auctionEnd;
-    private String color;
-    private String size;
 
     @ManyToOne
     @JsonManagedReference
@@ -52,17 +50,6 @@ public class Product extends AuditModel {
     private Set<Watch> watchList = new HashSet<>( );
 
     public Product() {
-    }
-
-    public Product(String name, String description, BigDecimal startPrice, Instant auctionStart,
-                   Instant auctionEnd, String color, String size) {
-        this.name = name;
-        this.description = description;
-        this.startPrice = startPrice;
-        this.auctionStart = auctionStart;
-        this.auctionEnd = auctionEnd;
-        this.color = color;
-        this.size = size;
     }
 
     public Long getId() {
@@ -111,22 +98,6 @@ public class Product extends AuditModel {
 
     public void setAuctionEnd(Instant auctionEnd) {
         this.auctionEnd = auctionEnd;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
     }
 
     public Subcategory getSubcategory() {

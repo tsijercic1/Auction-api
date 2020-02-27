@@ -1,15 +1,14 @@
-package com.github.tsijercic1.auctionapi.payload;
+package com.github.tsijercic1.auctionapi.response;
 
-public class UserData {
+public class UserDataResponse {
     private Long id;
-    private String username, email, name, surname, token;
+    private String email, name, surname, token;
 
-    public UserData() {
+    public UserDataResponse() {
     }
 
-    public UserData(Long id, String username, String email, String name, String surname, String token) {
+    public UserDataResponse(Long id, String username, String email, String name, String surname, String token) {
         this.id = id;
-        this.username = username;
         this.email = email;
         this.name = name;
         this.surname = surname;
@@ -22,14 +21,6 @@ public class UserData {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getEmail() {

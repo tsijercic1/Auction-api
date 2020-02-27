@@ -16,19 +16,19 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     /**
      *
-     * @param usernameOrEmail
-     * username or email of the user
+     * @param email
+     * email of the user
      * @return
      * returns the details of the user such as name, surname, roles used for access control
      * @throws UsernameNotFoundException
      */
     @Override
     @Transactional
-    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        User user = userRepository.findByUsernameOrEmail(usernameOrEmail, usernameOrEmail)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with username or email : " + usernameOrEmail)
+                        new UsernameNotFoundException("User not found with username or email : " + email)
                 );
 
         return UserPrincipal.create(user);

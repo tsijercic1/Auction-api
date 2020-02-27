@@ -6,7 +6,7 @@ import com.github.tsijercic1.auctionapi.exceptions.UnauthorizedException;
 import com.github.tsijercic1.auctionapi.models.Product;
 import com.github.tsijercic1.auctionapi.models.ProductPicture;
 import com.github.tsijercic1.auctionapi.models.User;
-import com.github.tsijercic1.auctionapi.payload.ProductRequest;
+import com.github.tsijercic1.auctionapi.request.ProductRequest;
 import com.github.tsijercic1.auctionapi.repositories.UserRepository;
 import com.github.tsijercic1.auctionapi.security.Authorizer;
 import com.github.tsijercic1.auctionapi.security.CurrentUser;
@@ -54,54 +54,52 @@ public class ProductController {
     @GetMapping("/products")
     @PermitAll
     public ResponseEntity<Iterable<Product>> getAll(Pageable pageable) {
-        logger.info("Accessed route products");
         return ResponseEntity.ok(productService.getAll(pageable));
     }
 
-    @GetMapping("/{username}/products")
-    public ResponseEntity<List<Product>> getAllForUser(@PathVariable String username, @CurrentUser UserPrincipal userPrincipal) {
+    @GetMapping("/{userId}/products")
+    public ResponseEntity<List<Product>> getAllForUser(@PathVariable Long userId, @CurrentUser UserPrincipal userPrincipal) {
         Authorizer.validateAuthority(userPrincipal,"USER");
-        User user = checkAuthorization(username, userPrincipal);
+        User user = checkAuthorization(userId, userPrincipal);
         return ResponseEntity.ok(productService.getAllForUser(user));
     }
 
-    @PostMapping("/{username}/products")
-    public ResponseEntity<Product> create(@PathVariable String username, @Valid @RequestBody ProductRequest productRequest, @CurrentUser UserPrincipal userPrincipal) {
+    @PostMapping("/{userId}/products")
+    public ResponseEntity<Product> create(@PathVariable Long userId, @Valid @RequestBody ProductRequest productRequest, @CurrentUser UserPrincipal userPrincipal) {
         Authorizer.validateAuthority(userPrincipal,"USER");
-        User user = checkAuthorization(username, userPrincipal);
+        User user = checkAuthorization(userId, userPrincipal);
         Product product = new Product();
         transformToProduct(productRequest, user, product);
         return ResponseEntity.ok(productService.create(product));
     }
 
-    @PostMapping("/{username}/products/{id}/images")
-    public ResponseEntity<Iterable<ProductPicture>> uploadPictures(@PathVariable("username") String username,
+    @PostMapping("/{userId}/products/{id}/images")
+    public ResponseEntity<Iterable<ProductPicture>> uploadPictures(@PathVariable("userId") Long userId,
                                                                    @PathVariable("id") Long id,
                                                                    @CurrentUser UserPrincipal userPrincipal,
                                                                    @RequestParam("pictures") MultipartFile[] multipartFiles) {
         Authorizer.validateAuthority(userPrincipal,"USER");
+        User user = checkAuthorization(userId, userPrincipal);
+
         Product product = productService.get(id);
         if (product == null) {
             throw new ResourceNotFoundException("Product", "id", id);
         }
-        if (!userPrincipal.getUsername().equals(username)) {
-            throw new UnauthorizedException("You are not logged into your account!");
-        }
-        if (!product.getSeller().getUsername().equals(username)) {
+        if (!product.getSeller().getId().equals(userId)) {
             throw new UnauthorizedException("You do not own this product!");
         }
         return ResponseEntity.ok(Arrays.stream(multipartFiles).map(multipartFile ->
-            productPictureService.create(multipartFile, product)
+                productPictureService.create(multipartFile, product)
         ).collect(Collectors.toList()));
     }
 
-    private User checkAuthorization(@PathVariable String username, @CurrentUser UserPrincipal userPrincipal) {
-        Optional<User> user = userRepository.findByUsername(username);
+    private User checkAuthorization(@PathVariable Long userId, @CurrentUser UserPrincipal userPrincipal) {
+        Optional<User> user = userRepository.findById(userId);
         if (!user.isPresent()) {
-            throw new ResourceNotFoundException("User", "username", username);
+            throw new ResourceNotFoundException("User", "Id", userId);
         }
-        if (!user.get().getUsername().equals(userPrincipal.getUsername())) {
-            throw new UnauthorizedException("Username is not yours");
+        if (!user.get().getEmail().equals(userPrincipal.getEmail())) {
+            throw new UnauthorizedException("You are not logged into your account");
         }
         return user.get();
     }
@@ -109,8 +107,6 @@ public class ProductController {
     private void transformToProduct(@RequestBody @Valid ProductRequest productRequest, User user, Product product) {
         product.setName(productRequest.getName());
         product.setDescription(productRequest.getDescription());
-        product.setColor(productRequest.getColor());
-        product.setSize(productRequest.getSize());
         product.setStartPrice(productRequest.getStartPrice());
         product.setSubcategory(
                 categoryService
