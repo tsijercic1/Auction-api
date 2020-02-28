@@ -3,11 +3,11 @@ package com.github.tsijercic1.auctionapi.controllers;
 import com.github.tsijercic1.auctionapi.configuration.FileStorageConfiguration;
 import com.github.tsijercic1.auctionapi.exceptions.ResourceNotFoundException;
 import com.github.tsijercic1.auctionapi.exceptions.UnauthorizedException;
-import com.github.tsijercic1.auctionapi.models.Product;
-import com.github.tsijercic1.auctionapi.models.ProductPicture;
-import com.github.tsijercic1.auctionapi.models.User;
+import com.github.tsijercic1.auctionapi.models.*;
 import com.github.tsijercic1.auctionapi.request.ProductRequest;
 import com.github.tsijercic1.auctionapi.repositories.UserRepository;
+import com.github.tsijercic1.auctionapi.response.CategoryDataResponse;
+import com.github.tsijercic1.auctionapi.response.SubcategoryData;
 import com.github.tsijercic1.auctionapi.security.Authorizer;
 import com.github.tsijercic1.auctionapi.security.CurrentUser;
 import com.github.tsijercic1.auctionapi.security.UserPrincipal;
@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,6 +56,26 @@ public class ProductController {
     @PermitAll
     public ResponseEntity<Iterable<Product>> getAll(Pageable pageable) {
         return ResponseEntity.ok(productService.getAll(pageable));
+    }
+
+    @GetMapping("/categories")
+    @PermitAll
+    public ResponseEntity<Iterable<CategoryDataResponse>> getCategories() {
+        List<Category> categories = categoryService.getCategories();
+        List<CategoryDataResponse> response = categories.stream().map(category -> {
+            Collection<Subcategory> subcategories = category.getSubcategories();
+            return new CategoryDataResponse(
+                    category.getId(),
+                    category.getName(),
+                    subcategories.stream().map(
+                            subcategory ->
+                                    new SubcategoryData(
+                                            subcategory.getId(),
+                                            subcategory.getName()
+                                    )
+                    ).collect(Collectors.toList()));
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{userId}/products")
