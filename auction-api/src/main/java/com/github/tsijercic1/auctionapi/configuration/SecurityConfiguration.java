@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * securedEnabled enables method level security to use like @Secured("ADMIN")
  * jsr250Enabled enables the annotation @RolesAllowed("USER")
  * prePostEnabled enables more complex expression based access control syntax
- *                  with @PreAuthorize and @PostAuthorize
+ * with @PreAuthorize and @PostAuthorize
  */
 @Configuration
 @EnableWebSecurity
@@ -32,6 +32,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
         prePostEnabled = true
 )
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+    private static final String[] UNPROTECTED_ROUTES = {
+            "/api/categories",
+            "/api/products",
+            "/images/*",
+            "/api/auth/*",
+            "/api/test"
+    };
+
+
+
     @Autowired
     CustomUserDetailsService customUserDetailsService;
 
@@ -45,6 +55,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     /**
      * configuring the manager for user roles and user details and the algorithm for password encoding
+     *
      * @param authenticationManagerBuilder
      * @throws Exception
      */
@@ -73,8 +84,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
      * configuring cors csrf
      * unauthorizedHandler returns unauthorized as a response
      * adds our own layer of filtering the web token that is received
-     * @param http
-     * security of the communication between clients and this server
+     *
+     * @param http security of the communication between clients and this server
      * @throws Exception
      */
     @Override
@@ -101,9 +112,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/**/*.css",
                         "/**/*.js")
                 .permitAll()
-                .antMatchers("/api/auth/**", "/api/products", "/api/categories", "/api/**/products", "/image/**")
-                .permitAll()
-                .antMatchers("/api/user/checkUsernameAvailability", "/api/user/checkEmailAvailability")
+                .antMatchers(UNPROTECTED_ROUTES)
                 .permitAll()
                 .anyRequest()
                 .authenticated();
