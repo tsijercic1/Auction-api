@@ -7,6 +7,7 @@ import com.github.tsijercic1.auctionapi.models.*;
 import com.github.tsijercic1.auctionapi.request.ProductRequest;
 import com.github.tsijercic1.auctionapi.repositories.UserRepository;
 import com.github.tsijercic1.auctionapi.response.CategoryDataResponse;
+import com.github.tsijercic1.auctionapi.response.ProductDataResponse;
 import com.github.tsijercic1.auctionapi.response.SubcategoryData;
 import com.github.tsijercic1.auctionapi.security.Authorizer;
 import com.github.tsijercic1.auctionapi.security.CurrentUser;
@@ -26,14 +27,10 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.time.Instant;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200/")
 @RequestMapping("/api")
 public class ProductController {
     final ProductService productService;
@@ -61,11 +58,25 @@ public class ProductController {
 
     @GetMapping("/products")
     @PermitAll
-    public ResponseEntity<Iterable<Product>> getAll(
+    public ResponseEntity<Iterable<ProductDataResponse>> getAll(
             Pageable pageable,
-            @Nullable @RequestParam("category") String categoryName,
-            @Nullable @RequestParam("subcategory") String subcategoryName) {
-        return ResponseEntity.ok(productService.getAll(categoryName, subcategoryName));
+            @RequestParam(value = "category", required = false) String categoryName,
+            @RequestParam(value = "subcategory", required = false) String subcategoryName) {
+        List<ProductDataResponse> result = ((List<Product>) productService.getAll(categoryName, subcategoryName)).stream().map(product -> new ProductDataResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                new CategoryDataResponse(
+                        product.getSubcategory().getCategory().getId(),
+                        product.getSubcategory().getCategory().getName(),
+                        new ArrayList<>(Collections.singletonList(new SubcategoryData(product.getSubcategory().getId(), product.getSubcategory().getName())))
+                ),
+                product.getStartPrice(),
+                product.getAuctionStart(),
+                product.getAuctionEnd(),
+                product.getPictures().stream().map(ProductPicture::getUrl).collect(Collectors.toList())
+        )).collect(Collectors.toList());
+        return ResponseEntity.ok(result);
     }
 
     @GetMapping("/categories")

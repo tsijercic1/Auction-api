@@ -26,6 +26,7 @@ file:
 app:
   jwtSecret: JWTSuperSecretKey
   jwtExpirationInMs: 9000000
+  clientOrigin: http://localhost:4200
 
 logging:
   level:

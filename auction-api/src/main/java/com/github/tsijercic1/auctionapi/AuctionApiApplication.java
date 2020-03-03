@@ -1,11 +1,15 @@
 package com.github.tsijercic1.auctionapi;
 
 import com.github.tsijercic1.auctionapi.configuration.FileStorageConfiguration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.convert.threeten.Jsr310JpaConverters;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
@@ -24,6 +28,9 @@ import java.util.TimeZone;
 })
 public class AuctionApiApplication {
 
+    @Value("${app.clientOrigin}")
+    private String clientOrigin;
+
     @PostConstruct
     void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -31,6 +38,16 @@ public class AuctionApiApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AuctionApiApplication.class, args);
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/api/*").allowedOrigins(clientOrigin);
+            }
+        };
     }
 
 }
