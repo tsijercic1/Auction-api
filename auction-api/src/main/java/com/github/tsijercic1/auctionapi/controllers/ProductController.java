@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
+@CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
     final ProductService productService;
     final UserRepository userRepository;
@@ -55,6 +56,30 @@ public class ProductController {
         return Instant.now();
     }
 
+    @GetMapping("/products/{id}")
+    @PermitAll
+    public ResponseEntity<ProductDataResponse> getSingle(@PathVariable Long id) {
+        Product result = productService.get(id);
+        return ResponseEntity.ok(
+                mapToProductResponse(result));
+    }
+
+    private ProductDataResponse mapToProductResponse(Product result) {
+        return new ProductDataResponse(
+                result.getId(),
+                result.getName(),
+                result.getDescription(),
+                new CategoryDataResponse(
+                        result.getSubcategory().getCategory().getId(),
+                        result.getSubcategory().getCategory().getName(),
+                        new ArrayList<>(Collections.singletonList(new SubcategoryData(result.getSubcategory().getId(), result.getSubcategory().getName())))
+                ),
+                result.getStartPrice(),
+                result.getAuctionStart(),
+                result.getAuctionEnd(),
+                result.getPictures().stream().map(ProductPicture::getUrl).collect(Collectors.toList())
+        );
+    }
 
     @GetMapping("/products")
     @PermitAll
@@ -62,20 +87,7 @@ public class ProductController {
             Pageable pageable,
             @RequestParam(value = "category", required = false) String categoryName,
             @RequestParam(value = "subcategory", required = false) String subcategoryName) {
-        List<ProductDataResponse> result = ((List<Product>) productService.getAll(categoryName, subcategoryName)).stream().map(product -> new ProductDataResponse(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                new CategoryDataResponse(
-                        product.getSubcategory().getCategory().getId(),
-                        product.getSubcategory().getCategory().getName(),
-                        new ArrayList<>(Collections.singletonList(new SubcategoryData(product.getSubcategory().getId(), product.getSubcategory().getName())))
-                ),
-                product.getStartPrice(),
-                product.getAuctionStart(),
-                product.getAuctionEnd(),
-                product.getPictures().stream().map(ProductPicture::getUrl).collect(Collectors.toList())
-        )).collect(Collectors.toList());
+        List<ProductDataResponse> result = ((List<Product>) productService.getAll(categoryName, subcategoryName)).stream().map(this::mapToProductResponse).collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
 

@@ -23,22 +23,26 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin(origins = "http://localhost:4200")
 public class AuthenticationController {
 
-    final AuthenticationManager authenticationManager;
-    final UserRepository userRepository;
-    final RoleRepository roleRepository;
-    final PasswordEncoder passwordEncoder;
-    final JwtTokenProvider tokenProvider;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenProvider tokenProvider;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, UserRepository userRepository,
-                                    RoleRepository roleRepository, PasswordEncoder passwordEncoder,
-                                    JwtTokenProvider tokenProvider) {
+    public AuthenticationController(final AuthenticationManager authenticationManager,
+                                    final UserRepository userRepository,
+                                    final RoleRepository roleRepository,
+                                    final PasswordEncoder passwordEncoder,
+                                    final JwtTokenProvider tokenProvider) {
         this.authenticationManager = authenticationManager;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
@@ -47,6 +51,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
+    @PermitAll
     public ResponseEntity<?> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
         String email = loginRequest.getEmail();
         String password = loginRequest.getPassword();
@@ -96,6 +101,7 @@ public class AuthenticationController {
      * @return
      */
     @PostMapping("/register")
+    @PermitAll
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest registrationRequest) {
         if (userRepository.existsByEmail(registrationRequest.getEmail())) {
             return new ResponseEntity<>(new ApiResponse(false, "Email Address already in use!"),
@@ -112,13 +118,14 @@ public class AuthenticationController {
                 .orElseThrow(() -> new AppException("User Role not set."));
 
         user.setRole(userRole);
-
+        System.out.println(user.getId());
         userRepository.save(user);
 
         return authenticateUser(user.getEmail(), registrationRequest.getPassword());
     }
 
     @PostMapping("/refresh")
+    @PermitAll
     public ResponseEntity<?> refreshUserData(@CurrentUser UserPrincipal userPrincipal) {
         String jwt = tokenProvider.generateToken(userPrincipal);
         UserDataResponse userDataResponse = getUserDataResponse(userPrincipal.getEmail(), jwt);

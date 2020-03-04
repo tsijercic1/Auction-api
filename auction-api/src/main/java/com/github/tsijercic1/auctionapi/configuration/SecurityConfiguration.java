@@ -18,6 +18,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.util.Objects;
+
 /**
  * securedEnabled enables method level security to use like @Secured("ADMIN")
  * jsr250Enabled enables the annotation @RolesAllowed("USER")
@@ -33,20 +35,28 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 )
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     private static final String[] UNPROTECTED_ROUTES = {
+            "/api/auth/register",
+            "/api/auth/login",
+            "/api/auth/refresh",
             "/api/categories",
             "/api/products",
+            "/api/products/*",
             "/images/*",
-            "/api/auth/*",
             "/api/test"
     };
 
 
 
-    @Autowired
-    CustomUserDetailsService customUserDetailsService;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+    private final JwtAuthenticationEntryPoint unauthorizedHandler;
+
+    public SecurityConfiguration(final CustomUserDetailsService customUserDetailsService,
+                                 final JwtAuthenticationEntryPoint unauthorizedHandler) {
+
+        this.customUserDetailsService = customUserDetailsService;
+        this.unauthorizedHandler = unauthorizedHandler;
+    }
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -108,6 +118,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                         "/**/*.gif",
                         "/**/*.svg",
                         "/**/*.jpg",
+                        "/**/*.jpeg",
                         "/**/*.html",
                         "/**/*.css",
                         "/**/*.js")

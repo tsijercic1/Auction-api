@@ -28,9 +28,6 @@ import java.util.TimeZone;
 })
 public class AuctionApiApplication {
 
-    @Value("${app.clientOrigin}")
-    private String clientOrigin;
-
     @PostConstruct
     void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
@@ -40,14 +37,5 @@ public class AuctionApiApplication {
         SpringApplication.run(AuctionApiApplication.class, args);
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/*").allowedOrigins(clientOrigin);
-            }
-        };
-    }
 
 }
