@@ -10,7 +10,7 @@ insert into categories values (9,now(),now(),'Computer');
 insert into categories values (10,now(),now(),'Tools');
 insert into categories values (11,now(),now(),'Books');
 
-insert into subcategories values (1,now(),now(),'Fifties',1);
+insert into subcategories values (1,now(),now(),'Women''s clothing',1);
 insert into subcategories values (2,now(),now(),'Necklaces',2);
 insert into subcategories values (3,now(),now(),'Silver',3);
 insert into subcategories values (4,now(),now(),'Winter',4);
@@ -22,7 +22,7 @@ insert into subcategories values (9,now(),now(),'Memory',9);
 insert into subcategories values (10,now(),now(),'Plumbing',10);
 insert into subcategories values (11,now(),now(),'Adventure',11);
 
-insert into subcategories values (12,now(),now(),'Sixties',1);
+insert into subcategories values (12,now(),now(),'Men''s clothing',1);
 insert into subcategories values (13,now(),now(),'Gloves',2);
 insert into subcategories values (14,now(),now(),'Gold',3);
 insert into subcategories values (15,now(),now(),'Summer',4);

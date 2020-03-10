@@ -1,11 +1,15 @@
 package com.github.tsijercic1.auctionapi.controllers;
 
 import com.github.tsijercic1.auctionapi.configuration.FileStorageConfiguration;
+import com.github.tsijercic1.auctionapi.exceptions.InvalidRequestValueException;
 import com.github.tsijercic1.auctionapi.exceptions.ResourceNotFoundException;
 import com.github.tsijercic1.auctionapi.exceptions.UnauthorizedException;
 import com.github.tsijercic1.auctionapi.models.*;
+import com.github.tsijercic1.auctionapi.repositories.BidRepository;
+import com.github.tsijercic1.auctionapi.request.BidRequest;
 import com.github.tsijercic1.auctionapi.request.ProductRequest;
 import com.github.tsijercic1.auctionapi.repositories.UserRepository;
+import com.github.tsijercic1.auctionapi.response.BidDataResponse;
 import com.github.tsijercic1.auctionapi.response.CategoryDataResponse;
 import com.github.tsijercic1.auctionapi.response.ProductDataResponse;
 import com.github.tsijercic1.auctionapi.response.SubcategoryData;
@@ -16,17 +20,14 @@ import com.github.tsijercic1.auctionapi.services.CategoryService;
 import com.github.tsijercic1.auctionapi.services.FileStorageService;
 import com.github.tsijercic1.auctionapi.services.ProductPictureService;
 import com.github.tsijercic1.auctionapi.services.ProductService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
-import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -34,26 +35,82 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:4200")
 public class ProductController {
-    final ProductService productService;
-    final UserRepository userRepository;
-    final FileStorageService fileStorageService;
-    final CategoryService categoryService;
-    final FileStorageConfiguration fileStorageConfiguration;
-    final ProductPictureService productPictureService;
+    private final ProductService productService;
+    private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
+    private final CategoryService categoryService;
+    private final FileStorageConfiguration fileStorageConfiguration;
+    private final ProductPictureService productPictureService;
+    private final BidRepository bidRepository;
 
-    public ProductController(ProductService productService, UserRepository userRepository, FileStorageService fileStorageService, CategoryService categoryService, FileStorageConfiguration fileStorageConfiguration, ProductPictureService productPictureService) {
+    @Value("${app.test}")
+    private String test;
+
+
+    public ProductController(final ProductService productService, final UserRepository userRepository,
+                             final FileStorageService fileStorageService, final CategoryService categoryService,
+                             final FileStorageConfiguration fileStorageConfiguration,
+                             final ProductPictureService productPictureService,
+                             final BidRepository bidRepository) {
         this.productService = productService;
         this.userRepository = userRepository;
         this.fileStorageService = fileStorageService;
         this.categoryService = categoryService;
         this.fileStorageConfiguration = fileStorageConfiguration;
         this.productPictureService = productPictureService;
+        this.bidRepository = bidRepository;
     }
 
     @GetMapping("/test")
     @PermitAll
-    public Instant test() {
-        return Instant.now();
+    public String test() {
+        System.out.println(test);
+        return test;
+    }
+
+    @PostMapping("/products/{id}/bids")
+    @PermitAll
+    public ResponseEntity<List<BidDataResponse>> bid(@PathVariable Long id, @RequestParam BidRequest bidRequest, @CurrentUser UserPrincipal userPrincipal) {
+        Authorizer.validateAuthority(userPrincipal, "USER");
+        Product product = productService.get(id);
+        if(product == null){
+            throw new ResourceNotFoundException("Product", "id", id);
+        }
+        Set<Bid> bids = product.getBids();
+        if (bidRequest.getAmount().compareTo(product.getStartPrice())<=0 && bids.stream().anyMatch(bid -> bid.getAmount().compareTo(bidRequest.getAmount()) >= 0)) {
+            throw new InvalidRequestValueException();
+        }
+        Bid bid = new Bid();
+        bid.setAmount(bidRequest.getAmount());
+        bid.setBidder(userRepository.findById(bidRequest.getBidderId()).get());
+        bid.setProduct(productService.get(bidRequest.getProductId()));
+        Bid result = bidRepository.save(bid);
+        bids.add(result);
+        return ResponseEntity.ok(mapToBidResponse(bids));
+    }
+
+    @GetMapping("/products/{id}/bids")
+    @PermitAll
+    public ResponseEntity<List<BidDataResponse>> getProductBids(@PathVariable Long id) {
+        Product product = productService.get(id);
+        if(product == null){
+            throw new ResourceNotFoundException("Product", "id", id);
+        }
+        Set<Bid> bids = product.getBids();
+        List<BidDataResponse> result = mapToBidResponse(bids);
+        return ResponseEntity.ok(result);
+    }
+
+    private List<BidDataResponse> mapToBidResponse(Set<Bid> bids) {
+        return bids
+                .stream()
+                .map(
+                        bid -> new BidDataResponse(
+                                bid.getId(),
+                                bid.getBidder().getId(),
+                                bid.getProduct().getId(),
+                                bid.getAmount(),
+                                bid.getCreatedAt().toInstant())).collect(Collectors.toList());
     }
 
     @GetMapping("/products/{id}")

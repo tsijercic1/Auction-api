@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Entity
 @Table(name = "bids")
-public class Bid extends AuditModel {
+public class Bid extends AuditModel implements Comparable<Bid> {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -57,5 +57,11 @@ public class Bid extends AuditModel {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+
+    @Override
+    public int compareTo(Bid o) {
+        return this.amount.compareTo(o.amount);
     }
 }
