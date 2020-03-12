@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"${app.clientOrigin}"})
 public class ProductController {
     private final ProductService productService;
     private final UserRepository userRepository;
@@ -43,8 +43,6 @@ public class ProductController {
     private final ProductPictureService productPictureService;
     private final BidRepository bidRepository;
 
-    @Value("${app.test}")
-    private String test;
 
 
     public ProductController(final ProductService productService, final UserRepository userRepository,
@@ -59,13 +57,6 @@ public class ProductController {
         this.fileStorageConfiguration = fileStorageConfiguration;
         this.productPictureService = productPictureService;
         this.bidRepository = bidRepository;
-    }
-
-    @GetMapping("/test")
-    @PermitAll
-    public String test() {
-        System.out.println(test);
-        return test;
     }
 
     @PostMapping("/products/{id}/bids")

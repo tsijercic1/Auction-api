@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/auction?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false
-    username: root
-    password: password
+    url: ${JDBC_DATABASE_URL}
+    username: ${JDBC_DATABASE_USERNAME}
+    password: ${JDBC_DATABASE_PASSWORD}
 
   jpa:
     properties:
@@ -21,13 +21,12 @@ spring:
   profiles:
     active: dev
 file:
-  upload-dir: /home/tarik/Desktop/pictures
+  upload-dir: ${UPLOAD_DIR}
 
 app:
   jwtSecret: JWTSuperSecretKey
   jwtExpirationInMs: 9000000
-  clientOrigin: http://localhost:4200
-  test: ${TEST}
+  clientOrigin: ${CLIENT_ORIGIN}
 
 logging:
   level:

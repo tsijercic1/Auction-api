@@ -1,8 +1,6 @@
 
 create sequence hibernate_sequence;
 
-alter sequence hibernate_sequence owner to root;
-
 create table categories
 (
 	id bigint not null
@@ -13,7 +11,6 @@ create table categories
 	name varchar(255)
 );
 
-alter table categories owner to root;
 
 create table roles
 (
@@ -24,8 +21,6 @@ create table roles
 		constraint uk_nb4h0p6txrmfc0xbrd1kglp9t
 			unique
 );
-
-alter table roles owner to root;
 
 create table subcategories
 (
@@ -40,7 +35,6 @@ create table subcategories
 			references categories
 );
 
-alter table subcategories owner to root;
 
 create table users
 (
@@ -63,7 +57,6 @@ create table users
 			references roles
 );
 
-alter table users owner to root;
 
 create table products
 (
@@ -85,7 +78,6 @@ create table products
 			references subcategories
 );
 
-alter table products owner to root;
 
 create table bids
 (
@@ -103,7 +95,6 @@ create table bids
 			references products
 );
 
-alter table bids owner to root;
 
 create table product_pictures
 (
@@ -118,7 +109,6 @@ create table product_pictures
 			references products
 );
 
-alter table product_pictures owner to root;
 
 create table watches
 (
@@ -135,7 +125,6 @@ create table watches
 			references users
 );
 
-alter table watches owner to root;
 
 insert into roles
 values (1, 'USER');

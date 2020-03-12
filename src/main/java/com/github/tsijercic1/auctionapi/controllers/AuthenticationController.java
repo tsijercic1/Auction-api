@@ -29,7 +29,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"${app.clientOrigin}"})
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
