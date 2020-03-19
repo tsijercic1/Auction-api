@@ -29,7 +29,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"${app.clientOrigin}"})
+@CrossOrigin(origins = {"https://auction-ts.herokuapp.com","http://localhost:4200"})
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
