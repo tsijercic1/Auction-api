@@ -127,6 +127,9 @@ public class AuthenticationController {
     @PostMapping("/refresh")
     @PermitAll
     public ResponseEntity<?> refreshUserData(@CurrentUser UserPrincipal userPrincipal) {
+        if (userPrincipal == null) {
+            return ResponseEntity.ok(new UserDataResponse());
+        }
         String jwt = tokenProvider.generateToken(userPrincipal);
         UserDataResponse userDataResponse = getUserDataResponse(userPrincipal.getEmail(), jwt);
         return ResponseEntity.ok(userDataResponse);
