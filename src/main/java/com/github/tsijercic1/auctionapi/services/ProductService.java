@@ -121,7 +121,7 @@ public class ProductService {
                         product.getName(),
                         product.getDescription(),
                         product.getStartPrice(),
-                        bids.stream().reduce(new SingleBid(),(a,b)->b.getAmount().compareTo(a.getAmount())>0?b:a).getAmount(),
+                        bids.stream().reduce(new SingleBid(),(a,b)->a!=null?b.getAmount().compareTo(a.getAmount())>0?b:a: null).getAmount(),
                         bids.size(),
                         product.getAuctionEnd(),
                         productPictureService.getPicturesForProductByProductId(product.getId())
