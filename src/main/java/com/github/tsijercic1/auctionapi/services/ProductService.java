@@ -11,6 +11,8 @@ import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProdu
 import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProductResponse;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -121,7 +123,7 @@ public class ProductService {
                         product.getName(),
                         product.getDescription(),
                         product.getStartPrice(),
-                        bids.stream().reduce(new SingleBid(),(a,b)->b!=null?a.getAmount().compareTo(b.getAmount())>0?a:b: null).getAmount(),
+                        bids.stream().reduce(new SingleBid("","", Instant.now(),new BigDecimal(0)),(a, b)->a.getAmount().compareTo(b.getAmount())>0?a:b).getAmount(),
                         bids.size(),
                         product.getAuctionEnd(),
                         productPictureService.getPicturesForProductByProductId(product.getId())
