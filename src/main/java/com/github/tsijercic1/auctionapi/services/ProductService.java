@@ -6,8 +6,9 @@ import com.github.tsijercic1.auctionapi.models.Product;
 import com.github.tsijercic1.auctionapi.models.Subcategory;
 import com.github.tsijercic1.auctionapi.models.User;
 import com.github.tsijercic1.auctionapi.repositories.ProductRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.github.tsijercic1.auctionapi.response.single_product_page.SingleBid;
+import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProduct;
+import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProductResponse;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,10 +21,17 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryService categoryService;
+    private final BidService bidService;
+    private final ProductPictureService productPictureService;
 
-    public ProductService(ProductRepository productRepository, CategoryService categoryService) {
+    public ProductService(final ProductRepository productRepository,
+                          final CategoryService categoryService,
+                          final BidService bidService,
+                          final ProductPictureService productPictureService) {
         this.productRepository = productRepository;
         this.categoryService = categoryService;
+        this.bidService = bidService;
+        this.productPictureService = productPictureService;
     }
 
     public Product get(Long id) {
@@ -43,7 +51,19 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Iterable<Product> getAll(String categoryName, String subcategoryName) {
+    public Iterable<Product> getAll(String categoryName, String subcategoryName, String search) {
+        if (search != null) {
+            return productRepository
+                    .findAll()
+                    .stream()
+                    .filter(
+                            product ->
+                                    product
+                                            .getName()
+                                            .contains(search)
+                    )
+                    .collect(Collectors.toList());
+        }
         if (subcategoryName != null && categoryName != null) {
             List<Category> categories = categoryService
                     .getCategories()
@@ -69,7 +89,14 @@ public class ProductService {
             return productRepository
                     .findAll()
                     .stream()
-                    .filter(product -> product.getSubcategory().getCategory().getName().equals(categoryName))
+                    .filter(
+                            product ->
+                                    product
+                                            .getSubcategory()
+                                            .getCategory()
+                                            .getName()
+                                            .equals(categoryName)
+                    )
                     .collect(Collectors.toList());
         }
         return productRepository.findAll();
@@ -79,5 +106,27 @@ public class ProductService {
         return productRepository.findAll().stream().filter(product ->
             product.getSeller().getId().equals(user.getId())
         ).collect(Collectors.toList());
+    }
+
+    public SingleProductResponse getSingleProductResponse(Long id) {
+        Optional<Product> optionalProduct = productRepository.findById(id);
+        if (!optionalProduct.isPresent()) {
+            throw new ResourceNotFoundException("Product", "id", id);
+        }
+        Product product = optionalProduct.get();
+        List<SingleBid> bids = bidService.getBidsForProductByProductId(product.getId());
+        return new SingleProductResponse(
+                new SingleProduct(
+                        product.getId(),
+                        product.getName(),
+                        product.getDescription(),
+                        product.getStartPrice(),
+                        bids.stream().reduce(new SingleBid(),(a,b)->b.getAmount().compareTo(a.getAmount())>0?b:a).getAmount(),
+                        bids.size(),
+                        product.getAuctionEnd(),
+                        productPictureService.getPicturesForProductByProductId(product.getId())
+                ),
+                bids
+        );
     }
 }

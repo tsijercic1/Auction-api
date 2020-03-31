@@ -1,6 +1,3 @@
-insert into users
-values (1, date('2020-02-29 11:07:52.663000'), date('2020-02-29 11:07:52.663000'), 'tarik.sijercic98@gmail.com', null,
-        'Tarik', '$2a$10$CWsDtNyZFv1ZY65s7xWzA.f/4v0AyVT7.KgRWkpaBWiQ.xCPxv3lK', null, null, 'Sijerčić', 1);
 
 insert into products
 values (1,

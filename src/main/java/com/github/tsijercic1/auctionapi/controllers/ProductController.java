@@ -13,16 +13,15 @@ import com.github.tsijercic1.auctionapi.response.BidDataResponse;
 import com.github.tsijercic1.auctionapi.response.CategoryDataResponse;
 import com.github.tsijercic1.auctionapi.response.ProductDataResponse;
 import com.github.tsijercic1.auctionapi.response.SubcategoryData;
-import com.github.tsijercic1.auctionapi.security.Authorizer;
+import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProductResponse;
 import com.github.tsijercic1.auctionapi.security.CurrentUser;
 import com.github.tsijercic1.auctionapi.security.UserPrincipal;
 import com.github.tsijercic1.auctionapi.services.CategoryService;
 import com.github.tsijercic1.auctionapi.services.FileStorageService;
 import com.github.tsijercic1.auctionapi.services.ProductPictureService;
 import com.github.tsijercic1.auctionapi.services.ProductService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -59,16 +58,31 @@ public class ProductController {
         this.bidRepository = bidRepository;
     }
 
+    @GetMapping("/products/{id}")
+    public ResponseEntity<SingleProductResponse> getSingle(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getSingleProductResponse(id));
+    }
+
+
+
+
     @PostMapping("/products/{id}/bids")
-    @PermitAll
-    public ResponseEntity<List<BidDataResponse>> bid(@PathVariable Long id, @RequestParam BidRequest bidRequest, @CurrentUser UserPrincipal userPrincipal) {
-        Authorizer.validateAuthority(userPrincipal, "USER");
+    @Secured("ROLE_USER")
+    public ResponseEntity<List<BidDataResponse>> bid(@PathVariable Long id, @RequestParam BidRequest bidRequest) {
         Product product = productService.get(id);
         if(product == null){
             throw new ResourceNotFoundException("Product", "id", id);
         }
         Set<Bid> bids = product.getBids();
-        if (bidRequest.getAmount().compareTo(product.getStartPrice())<=0 && bids.stream().anyMatch(bid -> bid.getAmount().compareTo(bidRequest.getAmount()) >= 0)) {
+        if (
+                bidRequest
+                        .getAmount()
+                        .compareTo(product.getStartPrice()) <= 0
+                        &&
+                        bids
+                                .stream()
+                                .anyMatch(bid -> bid.getAmount().compareTo(bidRequest.getAmount())>= 0)
+        ) {
             throw new InvalidRequestValueException();
         }
         Bid bid = new Bid();
@@ -101,15 +115,7 @@ public class ProductController {
                                 bid.getBidder().getId(),
                                 bid.getProduct().getId(),
                                 bid.getAmount(),
-                                bid.getCreatedAt().toInstant())).collect(Collectors.toList());
-    }
-
-    @GetMapping("/products/{id}")
-    @PermitAll
-    public ResponseEntity<ProductDataResponse> getSingle(@PathVariable Long id) {
-        Product result = productService.get(id);
-        return ResponseEntity.ok(
-                mapToProductResponse(result));
+                                bid.getCreatedAt())).collect(Collectors.toList());
     }
 
     private ProductDataResponse mapToProductResponse(Product result) {
@@ -120,27 +126,46 @@ public class ProductController {
                 new CategoryDataResponse(
                         result.getSubcategory().getCategory().getId(),
                         result.getSubcategory().getCategory().getName(),
-                        new ArrayList<>(Collections.singletonList(new SubcategoryData(result.getSubcategory().getId(), result.getSubcategory().getName())))
+                        new ArrayList<>(
+                                Collections
+                                        .singletonList(
+                                                new SubcategoryData(
+                                                        result
+                                                                .getSubcategory()
+                                                                .getId(),
+                                                        result
+                                                                .getSubcategory()
+                                                                .getName()
+                                                )
+                                        )
+                        )
                 ),
                 result.getStartPrice(),
                 result.getAuctionStart(),
                 result.getAuctionEnd(),
-                result.getPictures().stream().map(ProductPicture::getUrl).collect(Collectors.toList())
+                result.getPictures()
+                        .stream()
+                        .map(
+                                ProductPicture::getUrl
+                        )
+                        .collect(Collectors.toList())
         );
     }
 
     @GetMapping("/products")
-    @PermitAll
     public ResponseEntity<Iterable<ProductDataResponse>> getAll(
-            Pageable pageable,
+            @RequestParam(value = "q",required = false) String search,
             @RequestParam(value = "category", required = false) String categoryName,
             @RequestParam(value = "subcategory", required = false) String subcategoryName) {
-        List<ProductDataResponse> result = ((List<Product>) productService.getAll(categoryName, subcategoryName)).stream().map(this::mapToProductResponse).collect(Collectors.toList());
+        List<ProductDataResponse> result =
+                ((List<Product>) productService.getAll(categoryName, subcategoryName, search))
+                        .stream()
+                        .map(this::mapToProductResponse)
+                        .collect(Collectors.toList());
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/categories")
-    @PermitAll
     public ResponseEntity<Iterable<CategoryDataResponse>> getCategories() {
         List<Category> categories = categoryService.getCategories();
         List<CategoryDataResponse> response = categories.stream().map(category -> {
@@ -160,15 +185,19 @@ public class ProductController {
     }
 
     @GetMapping("/{userId}/products")
-    public ResponseEntity<List<Product>> getAllForUser(@PathVariable Long userId, @CurrentUser UserPrincipal userPrincipal) {
-        Authorizer.validateAuthority(userPrincipal,"USER");
-        User user = checkAuthorization(userId, userPrincipal);
-        return ResponseEntity.ok(productService.getAllForUser(user));
+    public ResponseEntity<List<Product>> getAllForUser(@PathVariable Long userId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        if (!optionalUser.isPresent()) {
+            throw new ResourceNotFoundException("User", "Id", userId);
+        }
+        return ResponseEntity.ok(productService.getAllForUser(optionalUser.get()));
     }
 
     @PostMapping("/{userId}/products")
-    public ResponseEntity<Product> create(@PathVariable Long userId, @Valid @RequestBody ProductRequest productRequest, @CurrentUser UserPrincipal userPrincipal) {
-        Authorizer.validateAuthority(userPrincipal,"USER");
+    @Secured("ROLE_USER")
+    public ResponseEntity<Product> create(@PathVariable Long userId,
+                                          @Valid @RequestBody ProductRequest productRequest,
+                                          @CurrentUser UserPrincipal userPrincipal) {
         User user = checkAuthorization(userId, userPrincipal);
         Product product = new Product();
         transformToProduct(productRequest, user, product);
@@ -176,13 +205,13 @@ public class ProductController {
     }
 
     @PostMapping("/{userId}/products/{id}/images")
-    public ResponseEntity<Iterable<ProductPicture>> uploadPictures(@PathVariable("userId") Long userId,
-                                                                   @PathVariable("id") Long id,
-                                                                   @CurrentUser UserPrincipal userPrincipal,
-                                                                   @RequestParam("pictures") MultipartFile[] multipartFiles) {
-        Authorizer.validateAuthority(userPrincipal,"USER");
-        User user = checkAuthorization(userId, userPrincipal);
-
+    @Secured("ROLE_USER")
+    public ResponseEntity<Iterable<ProductPicture>> uploadPictures(
+            @PathVariable("userId") Long userId,
+            @PathVariable("id") Long id,
+            @CurrentUser UserPrincipal userPrincipal,
+            @RequestParam("pictures") MultipartFile[] multipartFiles) {
+        checkAuthorization(userId, userPrincipal);
         Product product = productService.get(id);
         if (product == null) {
             throw new ResourceNotFoundException("Product", "id", id);
@@ -214,7 +243,10 @@ public class ProductController {
                 categoryService
                         .getSubcategoryByName(productRequest.getSubcategory())
                         .orElseThrow(
-                                () -> new ResourceNotFoundException("Subcategory", "name", productRequest.getSubcategory())));
+                                () -> new ResourceNotFoundException(
+                                        "Subcategory",
+                                        "name",
+                                        productRequest.getSubcategory())));
         product.setSeller(user);
         product.setAuctionStart(productRequest.getAuctionStart());
         product.setAuctionEnd(productRequest.getAuctionEnd());

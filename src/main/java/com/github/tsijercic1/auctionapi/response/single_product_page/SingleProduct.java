@@ -1,4 +1,4 @@
-package com.github.tsijercic1.auctionapi.response;
+package com.github.tsijercic1.auctionapi.response.single_product_page;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -11,13 +11,13 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ProductDataResponse {
+public class SingleProduct {
     private Long id;
     private String name;
     private String description;
-    private CategoryDataResponse category;
     private BigDecimal startPrice;
-    private Instant auctionStart;
+    private BigDecimal highestBid;
+    private Integer bidNumber;
     private Instant auctionEnd;
-    private List<String> pictures;
+    private List<SinglePicture> pictures;
 }
