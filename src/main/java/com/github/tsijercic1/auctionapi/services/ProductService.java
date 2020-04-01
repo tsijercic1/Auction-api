@@ -130,7 +130,7 @@ public class ProductService {
                         product.getStartPrice(),
                         bids.stream().reduce(new SingleBid("","", Instant.now(),new BigDecimal(0)),(a, b)->a.getAmount().compareTo(b.getAmount())>0?a:b).getAmount(),
                         bids.size(),
-                        LocalDate.ofInstant(product.getAuctionEnd(), ZoneOffset.UTC),
+                        product.getAuctionEnd().atZone( ZoneOffset.UTC).toLocalDate(),
                         productPictureService.getPicturesForProductByProductId(product.getId())
                 ),
                 bids
