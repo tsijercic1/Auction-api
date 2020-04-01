@@ -96,7 +96,7 @@ public class ProductController {
                                     return bid.getAmount().compareTo(bidRequest.getAmount().add(BigDecimal.valueOf(-0.9))) >= 0;
                                 })
         ) {
-            throw new InvalidRequestValueException();
+            throw new InvalidRequestValueException("Bid is too low");
         }
         Bid bid = new Bid();
         bid.setAmount(bidRequest.getAmount());
