@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -13,6 +13,6 @@ import java.time.Instant;
 public class SingleBid {
     private String name;
     private String url;
-    private Instant bidDate;
+    private LocalDate bidDate;
     private BigDecimal amount;
 }

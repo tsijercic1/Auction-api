@@ -14,6 +14,7 @@ import com.github.tsijercic1.auctionapi.response.BidDataResponse;
 import com.github.tsijercic1.auctionapi.response.CategoryDataResponse;
 import com.github.tsijercic1.auctionapi.response.ProductDataResponse;
 import com.github.tsijercic1.auctionapi.response.SubcategoryData;
+import com.github.tsijercic1.auctionapi.response.single_product_page.SingleBid;
 import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProductResponse;
 import com.github.tsijercic1.auctionapi.security.CurrentUser;
 import com.github.tsijercic1.auctionapi.security.UserPrincipal;
@@ -28,6 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.time.ZoneOffset;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -69,27 +72,36 @@ public class ProductController {
 
     @PostMapping("/products/{id}/bids")
     @Secured("ROLE_USER")
-    public ResponseEntity<List<BidDataResponse>> bid(@PathVariable Long id, @RequestParam BidRequest bidRequest) {
-        Product product = productService.get(id);
-        if(product == null){
+    public ResponseEntity<List<SingleBid>> bid(@PathVariable Long id,
+                                               @RequestBody BidRequest bidRequest,
+                                               @CurrentUser UserPrincipal userPrincipal) {
+        Optional<Product> optionalProduct = productService.get(id);
+        if(!optionalProduct.isPresent()){
             throw new ResourceNotFoundException("Product", "id", id);
         }
+        Product product = optionalProduct.get();
+
         Set<Bid> bids = product.getBids();
         if (
                 bidRequest
                         .getAmount()
                         .compareTo(product.getStartPrice()) <= 0
-                        &&
+                        ||
                         bids
                                 .stream()
-                                .anyMatch(bid -> bid.getAmount().compareTo(bidRequest.getAmount())>= 0)
+                                .anyMatch(bid -> {
+                                    System.out.println(bid.getAmount());
+                                    System.out.println(bidRequest.getAmount());
+                                    System.out.println(bidRequest.getAmount().add(BigDecimal.valueOf(-0.9)));
+                                    return bid.getAmount().compareTo(bidRequest.getAmount().add(BigDecimal.valueOf(-0.9))) >= 0;
+                                })
         ) {
             throw new InvalidRequestValueException();
         }
         Bid bid = new Bid();
         bid.setAmount(bidRequest.getAmount());
-        bid.setBidder(userRepository.findById(bidRequest.getBidderId()).get());
-        bid.setProduct(productService.get(bidRequest.getProductId()));
+        bid.setBidder(userRepository.findByEmail(userPrincipal.getEmail()).get());
+        bid.setProduct(product);
         Bid result = bidRepository.save(bid);
         bids.add(result);
         return ResponseEntity.ok(mapToBidResponse(bids));
@@ -97,26 +109,29 @@ public class ProductController {
 
     @GetMapping("/products/{id}/bids")
     @PermitAll
-    public ResponseEntity<List<BidDataResponse>> getProductBids(@PathVariable Long id) {
-        Product product = productService.get(id);
-        if(product == null){
+    public ResponseEntity<List<SingleBid>> getProductBids(@PathVariable Long id) {
+        Optional<Product> optionalProduct = productService.get(id);
+        if(!optionalProduct.isPresent()){
             throw new ResourceNotFoundException("Product", "id", id);
         }
+        Product product = optionalProduct.get();
         Set<Bid> bids = product.getBids();
-        List<BidDataResponse> result = mapToBidResponse(bids);
+        List<SingleBid> result = mapToBidResponse(bids);
         return ResponseEntity.ok(result);
     }
 
-    private List<BidDataResponse> mapToBidResponse(Set<Bid> bids) {
+    private List<SingleBid> mapToBidResponse(Set<Bid> bids) {
         return bids
                 .stream()
                 .map(
-                        bid -> new BidDataResponse(
-                                bid.getId(),
-                                bid.getBidder().getId(),
-                                bid.getProduct().getId(),
-                                bid.getAmount(),
-                                bid.getCreatedAt())).collect(Collectors.toList());
+                        bid -> new SingleBid(
+                                bid.getBidder().getName()+" "+bid.getBidder().getSurname(),
+                                bid.getBidder().getProfilePictureUrl(),
+                                bid.getCreatedAt().atZone(ZoneOffset.UTC).toLocalDate(),
+                                bid.getAmount()
+                        )
+                )
+                .collect(Collectors.toList());
     }
 
     private ProductDataResponse mapToProductResponse(Product result) {
@@ -222,10 +237,11 @@ public class ProductController {
             @CurrentUser UserPrincipal userPrincipal,
             @RequestParam("pictures") MultipartFile[] multipartFiles) {
         checkAuthorization(userId, userPrincipal);
-        Product product = productService.get(id);
-        if (product == null) {
+        Optional<Product> optionalProduct = productService.get(id);
+        if (!optionalProduct.isPresent()) {
             throw new ResourceNotFoundException("Product", "id", id);
         }
+        Product product = optionalProduct.get();
         if (!product.getSeller().getId().equals(userId)) {
             throw new UnauthorizedException("You do not own this product!");
         }

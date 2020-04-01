@@ -10,7 +10,5 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BidRequest {
-    private Long bidderId;
-    private Long productId;
     private BigDecimal amount;
 }

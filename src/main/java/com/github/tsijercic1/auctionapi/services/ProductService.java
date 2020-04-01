@@ -41,8 +41,8 @@ public class ProductService {
         this.productPictureService = productPictureService;
     }
 
-    public Product get(Long id) {
-        return productRepository.getOne(id);
+    public Optional<Product> get(Long id) {
+        return productRepository.findById(id);
     }
 
 
@@ -82,7 +82,7 @@ public class ProductService {
                         product.getName(),
                         product.getDescription(),
                         product.getStartPrice(),
-                        bids.stream().reduce(new SingleBid("","", Instant.now(),new BigDecimal(0)),(a, b)->a.getAmount().compareTo(b.getAmount())>0?a:b).getAmount(),
+                        bids.stream().reduce(new SingleBid("","", LocalDate.now(),new BigDecimal(0)),(a, b)->a.getAmount().compareTo(b.getAmount())>0?a:b).getAmount(),
                         bids.size(),
                         product.getAuctionEnd().atZone( ZoneOffset.UTC).toLocalDate(),
                         productPictureService.getPicturesForProductByProductId(product.getId())

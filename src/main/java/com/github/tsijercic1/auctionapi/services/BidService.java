@@ -4,6 +4,7 @@ import com.github.tsijercic1.auctionapi.repositories.BidRepository;
 import com.github.tsijercic1.auctionapi.response.single_product_page.SingleBid;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,7 @@ public class BidService {
                                 new SingleBid(
                                         bid.getBidder().getName()+" "+bid.getBidder().getSurname(),
                                         bid.getBidder().getProfilePictureUrl(),
-                                        bid.getCreatedAt(),
+                                        bid.getCreatedAt().atZone(ZoneOffset.UTC).toLocalDate(),
                                         bid.getAmount()
                                 )
                 )

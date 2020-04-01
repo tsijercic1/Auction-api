@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 
 
 @Data
@@ -16,5 +17,5 @@ public class BidDataResponse {
     private Long bidderId;
     private Long productId;
     private BigDecimal amount;
-    private Instant bidTime;
+    private LocalDate bidTime;
 }
