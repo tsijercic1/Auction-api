@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -18,6 +19,6 @@ public class SingleProduct {
     private BigDecimal startPrice;
     private BigDecimal highestBid;
     private Integer bidNumber;
-    private Instant auctionEnd;
+    private LocalDate auctionEnd;
     private List<SinglePicture> pictures;
 }

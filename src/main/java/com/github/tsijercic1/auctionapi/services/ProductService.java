@@ -11,8 +11,12 @@ import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProdu
 import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProductResponse;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.TemporalType;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -117,6 +121,7 @@ public class ProductService {
         }
         Product product = optionalProduct.get();
         List<SingleBid> bids = bidService.getBidsForProductByProductId(product.getId());
+        System.out.println(product.getAuctionEnd().toEpochMilli());
         return new SingleProductResponse(
                 new SingleProduct(
                         product.getId(),
@@ -125,7 +130,7 @@ public class ProductService {
                         product.getStartPrice(),
                         bids.stream().reduce(new SingleBid("","", Instant.now(),new BigDecimal(0)),(a, b)->a.getAmount().compareTo(b.getAmount())>0?a:b).getAmount(),
                         bids.size(),
-                        product.getAuctionEnd(),
+                        LocalDate.ofInstant(product.getAuctionEnd(), ZoneOffset.UTC),
                         productPictureService.getPicturesForProductByProductId(product.getId())
                 ),
                 bids

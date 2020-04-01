@@ -28,7 +28,6 @@ import java.util.TimeZone;
 })
 public class AuctionApiApplication {
 
-
     @PostConstruct
     void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
