@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = {"https://auction-ts.herokuapp.com","http://localhost:4200"})
+@CrossOrigin(origins = "https://auction-ts.herokuapp.com/")
 public class ProductController {
     private final ProductService productService;
     private final UserRepository userRepository;

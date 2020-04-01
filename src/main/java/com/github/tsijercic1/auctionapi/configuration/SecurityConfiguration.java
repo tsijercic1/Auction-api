@@ -41,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             "/api/categories",
             "/api/products",
             "/api/products/*",
-            "/api/*/products",
+            "/api/**/products",
             "/api/products/**/bids",
             "/images/*",
             "/api/test"
