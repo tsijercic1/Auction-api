@@ -7,6 +7,7 @@ import com.github.tsijercic1.auctionapi.exceptions.UnauthorizedException;
 import com.github.tsijercic1.auctionapi.models.*;
 import com.github.tsijercic1.auctionapi.repositories.BidRepository;
 import com.github.tsijercic1.auctionapi.request.BidRequest;
+import com.github.tsijercic1.auctionapi.request.FilterRequest;
 import com.github.tsijercic1.auctionapi.request.ProductRequest;
 import com.github.tsijercic1.auctionapi.repositories.UserRepository;
 import com.github.tsijercic1.auctionapi.response.BidDataResponse;
@@ -154,11 +155,20 @@ public class ProductController {
 
     @GetMapping("/products")
     public ResponseEntity<Iterable<ProductDataResponse>> getAll(
-            @RequestParam(value = "q",required = false) String search,
+            @RequestParam(value = "search",required = false) String search,
             @RequestParam(value = "category", required = false) String categoryName,
-            @RequestParam(value = "subcategory", required = false) String subcategoryName) {
+            @RequestParam(value = "subcategory", required = false) String subcategoryName,
+            @RequestParam(value = "minPrice", required = false) Integer minPrice,
+            @RequestParam(value = "maxPrice", required = false) Integer maxPrice,
+            @RequestParam(value = "orderBy", required = false) String orderBy,
+            @RequestParam(value = "page", required = false) Integer page,
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "descending", required = false) Boolean descending) {
+        FilterRequest filterRequest = new FilterRequest(
+                categoryName, subcategoryName, search, orderBy, minPrice, maxPrice, page, pageSize, descending
+        );
         List<ProductDataResponse> result =
-                ((List<Product>) productService.getAll(categoryName, subcategoryName, search))
+                ((List<Product>) productService.getAll(filterRequest))
                         .stream()
                         .map(this::mapToProductResponse)
                         .collect(Collectors.toList());

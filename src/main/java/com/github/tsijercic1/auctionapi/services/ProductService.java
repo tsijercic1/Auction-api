@@ -6,6 +6,7 @@ import com.github.tsijercic1.auctionapi.models.Product;
 import com.github.tsijercic1.auctionapi.models.Subcategory;
 import com.github.tsijercic1.auctionapi.models.User;
 import com.github.tsijercic1.auctionapi.repositories.ProductRepository;
+import com.github.tsijercic1.auctionapi.request.FilterRequest;
 import com.github.tsijercic1.auctionapi.response.single_product_page.SingleBid;
 import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProduct;
 import com.github.tsijercic1.auctionapi.response.single_product_page.SingleProductResponse;
@@ -57,55 +58,8 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    public Iterable<Product> getAll(String categoryName, String subcategoryName, String search) {
-        if (search != null) {
-            return productRepository
-                    .findAll()
-                    .stream()
-                    .filter(
-                            product ->
-                                    product
-                                            .getName()
-                                            .contains(search)
-                    )
-                    .collect(Collectors.toList());
-        }
-        if (subcategoryName != null && categoryName != null) {
-            List<Category> categories = categoryService
-                    .getCategories()
-                    .stream()
-                    .filter(category ->
-                            category
-                                    .getName()
-                                    .equals(categoryName))
-                    .collect(Collectors.toList());
-            if (categories.size() != 0) {
-                List<Subcategory> subcategories = categories
-                        .get(0)
-                        .getSubcategories()
-                        .stream()
-                        .filter(subcategory -> subcategory.getName().equals(subcategoryName))
-                        .collect(Collectors.toList());
-                if (subcategories.size() != 0) {
-                    return productRepository.findAllBySubcategory(subcategories.get(0));
-                }
-            }
-            return new ArrayList<>();
-        } else if (categoryName != null) {
-            return productRepository
-                    .findAll()
-                    .stream()
-                    .filter(
-                            product ->
-                                    product
-                                            .getSubcategory()
-                                            .getCategory()
-                                            .getName()
-                                            .equals(categoryName)
-                    )
-                    .collect(Collectors.toList());
-        }
-        return productRepository.findAll();
+    public Iterable<Product> getAll(FilterRequest filterRequest) {
+        return productRepository.findByFilter(filterRequest);
     }
 
     public List<Product> getAllForUser(User user) {
