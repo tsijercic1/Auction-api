@@ -12,16 +12,6 @@ create table categories
 );
 
 
-create table roles
-(
-	id bigint not null
-		constraint roles_pkey
-			primary key,
-	name varchar(60)
-		constraint uk_nb4h0p6txrmfc0xbrd1kglp9t
-			unique
-);
-
 create table subcategories
 (
 	id bigint not null
@@ -34,6 +24,17 @@ create table subcategories
 		constraint fkiborb6ptvy1t1n3v6klb56l5s
 			references categories
 );
+
+create table roles
+(
+	id bigint not null
+		constraint roles_pkey
+			primary key,
+	name varchar(60)
+		constraint uk_nb4h0p6txrmfc0xbrd1kglp9t
+			unique
+);
+
 
 
 create table users
@@ -50,12 +51,35 @@ create table users
 	name varchar(40),
 	password varchar(100),
 	phone_number varchar(255),
-	profile_picture_url varchar(255),
-	surname varchar(40),
-	role_id bigint
-		constraint fkp56c1712k691lhsyewcssf40f
-			references roles
+	profile_picture_url varchar,
+	surname varchar(40)
 );
+
+create table if not exists user_roles
+(
+    user_id bigint not null
+        constraint fkhfh9dx7w3ubf1co1vdev94g3f
+            references users,
+    role_id bigint not null
+        constraint fkh8ciramu9cc9q3qcqiv4ue8a6
+            references roles,
+    constraint user_roles_pkey
+        primary key (user_id, role_id)
+);
+
+insert into roles (id, name)
+values (1, 'ROLE_USER');
+
+
+insert into users
+values (1, date('2020-02-29 11:07:52.663000'), date('2020-02-29 11:07:52.663000'), 'tarik.sijercic98@gmail.com', null,
+        'Tarik', '$2a$10$CWsDtNyZFv1ZY65s7xWzA.f/4v0AyVT7.KgRWkpaBWiQ.xCPxv3lK', null, null, 'Sijerčić');
+
+
+insert into user_roles
+values (1, 1);
+
+
 
 
 create table products
@@ -124,8 +148,3 @@ create table watches
 		constraint fk9yirjrmybk1cpybnhu7314tne
 			references users
 );
-
-
-insert into roles
-values (1, 'USER');
-
