@@ -119,8 +119,9 @@ public class AuthenticationController {
                 .orElseThrow(() -> new AppException("User Role not set."));
 
         user.setRoles(Collections.singleton(userRole));
-        System.out.println(user.getId());
+        System.out.println("attempting to save");
         userRepository.save(user);
+        System.out.println(user.getId()+" id");
 
         return authenticateUser(user.getEmail(), registrationRequest.getPassword());
     }
