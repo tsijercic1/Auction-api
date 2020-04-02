@@ -3,7 +3,7 @@ package com.github.tsijercic1.auctionapi.controllers;
 import com.github.tsijercic1.auctionapi.exceptions.AppException;
 import com.github.tsijercic1.auctionapi.exceptions.ResourceNotFoundException;
 import com.github.tsijercic1.auctionapi.models.Role;
-import com.github.tsijercic1.auctionapi.models.RoleType;
+import com.github.tsijercic1.auctionapi.models.RoleName;
 import com.github.tsijercic1.auctionapi.models.User;
 import com.github.tsijercic1.auctionapi.payload.ApiResponse;
 import com.github.tsijercic1.auctionapi.repositories.RoleRepository;
@@ -25,11 +25,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.PermitAll;
 import javax.validation.Valid;
+import java.util.Collections;
 import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"https://auction-ts.herokuapp.com","http://localhost:4200"})
+@CrossOrigin(origins = "*")
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -114,12 +115,13 @@ public class AuthenticationController {
         user.setEmail(registrationRequest.getEmail());
         user.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
 
-        Role userRole = roleRepository.findByName(RoleType.USER)
+        Role userRole = roleRepository.findByName(RoleName.ROLE_USER)
                 .orElseThrow(() -> new AppException("User Role not set."));
 
-        user.setRole(userRole);
-        System.out.println(user.getId());
+        user.setRoles(Collections.singleton(userRole));
+        System.out.println("attempting to save");
         userRepository.save(user);
+        System.out.println(user.getId()+" id");
 
         return authenticateUser(user.getEmail(), registrationRequest.getPassword());
     }

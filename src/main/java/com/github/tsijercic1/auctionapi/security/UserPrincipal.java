@@ -38,7 +38,7 @@ public class UserPrincipal implements UserDetails {
      * @return
      */
     public static UserPrincipal create(User user) {
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(Collections.singleton(new SimpleGrantedAuthority("USER")));
+        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>(Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")));
 
         return new UserPrincipal(
                 user.getId(),
